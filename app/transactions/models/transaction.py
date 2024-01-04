@@ -53,13 +53,13 @@ class Transaction(models.Model):
     )
     strike_price = models.FloatField(null=True, blank=True)
 
-    datetime = models.DateTimeField()
+    executed_at = models.DateTimeField()
 
     class Meta:
         verbose_name = "Transaction"
         verbose_name_plural = "Transactions"
-        unique_together = ('asset', 'side', "price", "quantity", "datetime")
+        unique_together = ('asset', 'side', "price", "quantity", "executed_at")
 
 
     def __str__(self):
-        return f"{self.asset} - {self.price} {self.currency} - {self.quantity}"
+        return f"{self.side} {self.quantity} {self.asset} @ {self.price} {self.currency}"
