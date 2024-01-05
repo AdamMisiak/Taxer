@@ -25,6 +25,7 @@ def save_transactions_from_the_file(sender, instance, *args, **kwargs):
     executed_at_index = 6
     with instance.file.open('r') as file:
 
+        # NOTE close those in separated functions in logic file?
         # RATES FILE
         if instance.file.name.startswith("Rates"):
             csvreader = csv.reader(file, delimiter=';')
@@ -41,14 +42,6 @@ def save_transactions_from_the_file(sender, instance, *args, **kwargs):
                     rub=float(row[30].replace(",", ".")) if row[30] else None,
                 )
                 print(currency_rate)
-                # print(row)
-                # result = {
-                #     "date": row[0],
-                #     "USD": float(row[2].replace(",", ".")),
-                #     "EUR": float(row[8].replace(",", ".")),
-                #     "GBP": float(row[11].replace(",", ".")),
-                # }
-                # print(result)
 
         # BROKER FILE
         elif instance.file.name.startswith("IB"):
@@ -59,47 +52,76 @@ def save_transactions_from_the_file(sender, instance, *args, **kwargs):
                 # TRANSACTION
                 if row_type == "Trades" and row[1] == "Data":
                     print(row)
+                    # if jest numer konta to go usun
+                    if row[5].startswith("U"):
+                        del row[5]
+
                     # print("TRADE")
                     # TODO make it atomic
-                    print(get_option_type(row[asset_index]))
                     is_option = row[asset_type_index] == "Equity and Index Options"
                     transaction, created = Transaction.objects.get_or_create(
                         asset=row[asset_index],
-                        side="Buy" if int(row[quantity_index].replace(",", "")) > 0 else "Sell",
-                        asset_type=row[asset_type_index],
+                        side="Buy" if float(row[quantity_index].replace(",", "")) > 0 else "Sell",
+                        # asset_type=row[asset_type_index],
                         price=float(row[price_index]),
-                        quantity=int(row[quantity_index].replace(",", "")),
-                        value=float(row[value_index]),
-                        currency=row[currency_index],
-                        fee=float(row[fee_index]),
-                        option_type=get_option_type(row[asset_index]) if is_option else "",
-                        strike_price=get_strike_price(row[asset_index]) if is_option else None,
-                        executed_at=datetime.strptime(row[executed_at_index], '%Y-%m-%d, %H:%M:%S') + timedelta(hours=6)
+                        quantity=float(row[quantity_index].replace(",", "")),
+                        # value=float(row[value_index]),
+                        # currency=row[currency_index],
+                        # fee=float(row[fee_index]),
+                        # option_type=get_option_type(row[asset_index]) if is_option else "",
+                        # strike_price=get_strike_price(row[asset_index]) if is_option else None,
+                        executed_at=datetime.strptime(row[executed_at_index], '%Y-%m-%d, %H:%M:%S') + timedelta(hours=6),
+                        defaults={
+                            'asset_type': row[asset_type_index],
+                            'value': float(row[value_index]),
+                            'value_pln': float(row[value_index]),
+                            'currency': row[currency_index],
+                            'fee': float(row[fee_index]),
+                            'option_type': get_option_type(row[asset_index]) if is_option else "",
+                            'strike_price': get_strike_price(row[asset_index]) if is_option else None,
+                        }
                     )
 
+def increase_tax_to_pay(tax_year, increased_by):
+    previous_state, created = Tax.objects.get_or_create(year=tax_year, defaults={
+        'to_pay': 0
+    })
+    tax, created = Tax.objects.update_or_create(
+        year=tax_year,
+        defaults={
+            'to_pay': previous_state.to_pay+increased_by
+        }
+    )
+    print(tax.to_pay)
 
 
 @receiver(post_save, sender=Transaction)
 def calculate_tax_to_pay(sender, instance, *args, **kwargs):
+    tax_year = instance.executed_at.year
     if instance.asset_type == "Equity and Index Options":
-        tax_year = instance.executed_at.year
         transaction_currency = instance.currency.lower()
         transaction_date = instance.executed_at.date()
         print(instance.executed_at.date())
         # NOTE sprawdzic czy to ze nie ma dnia w nbp kursach czy znaczy ze faktycznie bylo swieto
+        # NOTE move it to reusable funtion? in utils file
         previous_currency_rate = CurrencyRate.objects.filter(date__lt=transaction_date).order_by('-date').first()
         print(previous_currency_rate)
 
         option_premium_pln = round(instance.value * getattr(previous_currency_rate, transaction_currency), 2)
         tax_to_pay_from_transaction = round(option_premium_pln * 0.19, 2)
 
-        previous_state, created = Tax.objects.get_or_create(year=tax_year, defaults={
-            'to_pay': 0
-        })
-        tax, created = Tax.objects.update_or_create(
-            year=instance.executed_at.year,
-            defaults={
-                'to_pay': previous_state.to_pay+tax_to_pay_from_transaction
-            }
-        )
-        print(tax.to_pay)
+        print(tax_year)
+        increase_tax_to_pay(tax_year, tax_to_pay_from_transaction)
+
+    elif instance.asset_type == "Stocks" and instance.side == "Sell":
+        print(instance)
+        matching_transactions = Transaction.objects.filter(asset=instance.asset, side="Buy").order_by("executed_at")
+        print(matching_transactions)
+        # NOTE gdzie zapisywac info ze transakcja juz rozliczona? nowy model match transakcji?
+        if len(matching_transactions) == 1:
+            if matching_transactions[0].quantity == instance.quantity:
+                print('calucalte tax here!')
+
+
+        tax_to_pay_from_transaction = 5
+        increase_tax_to_pay(tax_year, tax_to_pay_from_transaction)

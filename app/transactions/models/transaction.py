@@ -41,8 +41,9 @@ class Transaction(models.Model):
     )
 
     price = models.FloatField()
-    quantity = models.IntegerField()
+    quantity = models.FloatField()
     value =  models.FloatField()
+    value_pln =  models.FloatField()
     currency = models.CharField(
         max_length=3, choices=CURRENCY_CHOCIES
     )
@@ -62,4 +63,4 @@ class Transaction(models.Model):
 
 
     def __str__(self):
-        return f"{self.side} {self.quantity} {self.asset} @ {self.price} {self.currency}"
+        return f"{self.side} {self.quantity} {self.asset} @ {self.price} {self.currency} - {self.executed_at.date()}"
