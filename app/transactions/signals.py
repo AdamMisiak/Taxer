@@ -34,12 +34,14 @@ def save_transactions_from_the_file(sender, instance, *args, **kwargs):
                     continue
                 print(row)
 
-                currency_rate = CurrencyRate.objects.create(
+                currency_rate, created = CurrencyRate.objects.get_or_create(
                     date=datetime.strptime(row[0], '%Y%m%d'),
-                    usd=float(row[2].replace(",", ".")),
-                    eur=float(row[8].replace(",", ".")),
-                    gbp=float(row[11].replace(",", ".")),
-                    rub=float(row[30].replace(",", ".")) if row[30] else None,
+                    defaults = {
+                        "usd": float(row[2].replace(",", ".")),
+                        "eur": float(row[8].replace(",", ".")),
+                        "gbp": float(row[11].replace(",", ".")),
+                        "rub": float(row[30].replace(",", ".")) if row[30] else None,
+                    }
                 )
                 print(currency_rate)
 
@@ -58,7 +60,11 @@ def save_transactions_from_the_file(sender, instance, *args, **kwargs):
 
                     # print("TRADE")
                     # TODO make it atomic
-                    is_option = row[asset_type_index] == "Equity and Index Options"
+                    formatted_asset_type = row[asset_type_index].replace(" - Held with Interactive Brokers (U.K.) Limited carried by Interactive Brokers LLC", "").strip()
+                    print(formatted_asset_type)
+                    is_option = formatted_asset_type in ["Equity and Index Options"]
+                    executed_at = datetime.strptime(row[executed_at_index], '%Y-%m-%d, %H:%M:%S') + timedelta(hours=6)
+                    previous_day_currency_rate = CurrencyRate.objects.filter(date__lt=executed_at).order_by('-date').first()
                     transaction, created = Transaction.objects.get_or_create(
                         asset=row[asset_index],
                         side="Buy" if float(row[quantity_index].replace(",", "")) > 0 else "Sell",
@@ -72,10 +78,11 @@ def save_transactions_from_the_file(sender, instance, *args, **kwargs):
                         # strike_price=get_strike_price(row[asset_index]) if is_option else None,
                         executed_at=datetime.strptime(row[executed_at_index], '%Y-%m-%d, %H:%M:%S') + timedelta(hours=6),
                         defaults={
-                            'asset_type': row[asset_type_index],
+                            'asset_type': formatted_asset_type,
                             'value': float(row[value_index]),
-                            'value_pln': float(row[value_index]),
+                            'value_pln': round(float(row[value_index]) * getattr(previous_day_currency_rate, row[currency_index].lower()), 2) if row[currency_index].lower() != "pln" else float(row[value_index]),
                             'currency': row[currency_index],
+                            'previous_day_currency_rate': previous_day_currency_rate,
                             'fee': float(row[fee_index]),
                             'option_type': get_option_type(row[asset_index]) if is_option else "",
                             'strike_price': get_strike_price(row[asset_index]) if is_option else None,
@@ -104,10 +111,10 @@ def calculate_tax_to_pay(sender, instance, *args, **kwargs):
         print(instance.executed_at.date())
         # NOTE sprawdzic czy to ze nie ma dnia w nbp kursach czy znaczy ze faktycznie bylo swieto
         # NOTE move it to reusable funtion? in utils file
-        previous_currency_rate = CurrencyRate.objects.filter(date__lt=transaction_date).order_by('-date').first()
-        print(previous_currency_rate)
+        previous_day_currency_rate = CurrencyRate.objects.filter(date__lt=transaction_date).order_by('-date').first()
+        print(previous_day_currency_rate)
 
-        option_premium_pln = round(instance.value * getattr(previous_currency_rate, transaction_currency), 2)
+        option_premium_pln = round(instance.value * getattr(previous_day_currency_rate, transaction_currency), 2)
         tax_to_pay_from_transaction = round(option_premium_pln * 0.19, 2)
 
         print(tax_year)

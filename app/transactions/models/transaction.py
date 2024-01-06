@@ -1,4 +1,5 @@
 from django.db import models
+from .currency_rate import CurrencyRate
 
 SIDE_CHOICES = [
     ("Buy", "Buy"),
@@ -10,6 +11,7 @@ ASSET_TYPE_CHOICES = [
     ("Bonds", "Bonds"),
     ("Equity and Index Options", "Options"),
     ("ETFs", "ETFs"),
+    ("Forex", "Forex"),
 ]
 
 CURRENCY_CHOCIES = [
@@ -46,6 +48,10 @@ class Transaction(models.Model):
     value_pln =  models.FloatField()
     currency = models.CharField(
         max_length=3, choices=CURRENCY_CHOCIES
+    )
+    previous_day_currency_rate = models.ForeignKey(
+        CurrencyRate,
+        on_delete=models.RESTRICT, blank=True, null=True
     )
     fee = models.FloatField()
 
