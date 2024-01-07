@@ -1,4 +1,4 @@
 from .import_file import ImportFile
 from .transaction import Transaction
-from .tax import Tax
+from .tax_calculation import TaxCalculation
 from .currency_rate import CurrencyRate

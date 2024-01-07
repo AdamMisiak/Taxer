@@ -3,9 +3,9 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 import csv
 from datetime import datetime, timedelta
-from transactions.models import ImportFile, Transaction, Tax, CurrencyRate
+from transactions.models import ImportFile, Transaction, TaxCalculation, CurrencyRate
 import re
-
+from django.conf import settings
 
 def get_option_type(option_name: str) -> str:
     return "CALL" if option_name[-1] == "C" else "PUT"
@@ -89,17 +89,21 @@ def save_transactions_from_the_file(sender, instance, *args, **kwargs):
                         }
                     )
 
-def increase_tax_to_pay(tax_year, increased_by):
-    previous_state, created = Tax.objects.get_or_create(year=tax_year, defaults={
-        'to_pay': 0
+def update_tax_object(tax_year, revenue, cost, tax):
+    previous_state, created = TaxCalculation.objects.get_or_create(year=tax_year, defaults={
+        'revenue': 0,
+        'cost': 0,
+        'tax': 0
     })
-    tax, created = Tax.objects.update_or_create(
+    tax_object, created = TaxCalculation.objects.update_or_create(
         year=tax_year,
         defaults={
-            'to_pay': previous_state.to_pay+increased_by
+            'revenue': round(previous_state.revenue+revenue, 2),
+            'cost': round(previous_state.cost+cost, 2),
+            'tax': round(previous_state.tax+tax, 2)
         }
     )
-    print(tax.to_pay)
+    print(tax_object.tax)
 
 
 @receiver(post_save, sender=Transaction)
@@ -115,20 +119,32 @@ def calculate_tax_to_pay(sender, instance, *args, **kwargs):
         print(previous_day_currency_rate)
 
         option_premium_pln = round(instance.value * getattr(previous_day_currency_rate, transaction_currency), 2)
-        tax_to_pay_from_transaction = round(option_premium_pln * 0.19, 2)
+        tax_to_pay_from_transaction = round(option_premium_pln * settings.TAX_RATE, 2)
 
         print(tax_year)
-        increase_tax_to_pay(tax_year, tax_to_pay_from_transaction)
+        # NOTE different funtion for options: https://github.com/AdamMisiak/Tax_assistant/blob/master/options.py#L49
+        # update_tax_object(tax_year, tax_to_pay_from_transaction)
 
     elif instance.asset_type == "Stocks" and instance.side == "Sell":
-        print(instance)
-        matching_transactions = Transaction.objects.filter(asset=instance.asset, side="Buy").order_by("executed_at")
+        closing_transaction = instance
+        print(closing_transaction)
+        matching_transactions = Transaction.objects.filter(asset=closing_transaction.asset, side="Buy").order_by("executed_at")
         print(matching_transactions)
         # NOTE gdzie zapisywac info ze transakcja juz rozliczona? nowy model match transakcji?
         if len(matching_transactions) == 1:
-            if matching_transactions[0].quantity == instance.quantity:
-                print('calucalte tax here!')
+            opening_transaction = matching_transactions[0]
+            # NOTE make quantity abs when saving transactions? instead of here everytime?
+            if opening_transaction.quantity == abs(closing_transaction.quantity):
+                print(opening_transaction)
+                profit_or_loss = round(closing_transaction.value_pln + opening_transaction.value_pln, 2)
+                tax_to_pay_from_transaction = round(profit_or_loss * settings.TAX_RATE, 2)
+                print(opening_transaction.value_pln)
+                print(closing_transaction.value_pln)
+                print(profit_or_loss)
+                print(tax_to_pay_from_transaction)
+                update_tax_object(tax_year, closing_transaction.value_pln, opening_transaction.value_pln, tax_to_pay_from_transaction)
+
+        elif len(matching_transactions) > 1:
+            pass
 
 
-        tax_to_pay_from_transaction = 5
-        increase_tax_to_pay(tax_year, tax_to_pay_from_transaction)
