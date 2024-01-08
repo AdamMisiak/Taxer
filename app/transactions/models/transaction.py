@@ -34,12 +34,12 @@ class Transaction(models.Model):
     # )
     # NOTE broker
     # broker = models.relation(max_length=100, default="API")
-    asset = models.CharField(max_length=124)
-    side = models.CharField(
-        max_length=8, choices=SIDE_CHOICES
-    )
+    asset_name = models.CharField(max_length=124)
     asset_type = models.CharField(
         max_length=124, choices=ASSET_TYPE_CHOICES
+    )
+    side = models.CharField(
+        max_length=8, choices=SIDE_CHOICES
     )
 
     price = models.FloatField()
@@ -65,8 +65,12 @@ class Transaction(models.Model):
     class Meta:
         verbose_name = "Transaction"
         verbose_name_plural = "Transactions"
-        unique_together = ('asset', 'side', "price", "quantity", "executed_at")
+        unique_together = ('asset_name', 'side', "price", "quantity", "executed_at")
 
 
     def __str__(self):
-        return f"{self.side} {self.quantity} {self.asset} @ {self.price} {self.currency} - {self.executed_at.date()}"
+        return f"{self.side} {self.quantity} {self.asset_name} @ {self.price} {self.currency} - {self.executed_at.date()}"
+
+    def save(self, *args, **kwargs):
+        print(f"ℹ️  Created Transaction object: {self}")
+        super(Transaction, self).save(*args, **kwargs)

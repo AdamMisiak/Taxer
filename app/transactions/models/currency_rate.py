@@ -16,3 +16,7 @@ class CurrencyRate(models.Model):
 
     def __str__(self):
         return f"{self.date} - {self.usd} USD"
+
+    def save(self, *args, **kwargs):
+        print(f"ℹ️  Created CurrencyRate object: {self}")
+        super(CurrencyRate, self).save(*args, **kwargs)

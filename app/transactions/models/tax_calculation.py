@@ -5,11 +5,11 @@ from .transaction import Transaction
 class TaxCalculation(models.Model):
     opening_transaction = models.ForeignKey(
         Transaction, related_name="as_opening_calculation",
-        on_delete=models.RESTRICT, blank=True, null=True
+        on_delete=models.CASCADE, blank=True, null=True
     )
     closing_transaction = models.ForeignKey(
         Transaction, related_name="as_closing_calculation",
-        on_delete=models.RESTRICT, blank=True, null=True
+        on_delete=models.CASCADE, blank=True, null=True
     )
     revenue = models.FloatField()
     cost = models.FloatField()

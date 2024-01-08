@@ -6,88 +6,85 @@ from datetime import datetime, timedelta
 from transactions.models import ImportFile, Transaction, TaxSummary, CurrencyRate, TaxCalculation
 import re
 from django.conf import settings
+from transactions.logic import save_data_from_file
 
-def get_option_type(option_name: str) -> str:
-    return "CALL" if option_name[-1] == "C" else "PUT"
-
-def get_strike_price(option_name: str) -> float:
-    return float(option_name.split()[-2])
 
 @receiver(post_save, sender=ImportFile)
 def save_transactions_from_the_file(sender, instance, *args, **kwargs):
-    asset_index = 5
-    asset_type_index = 3
-    price_index = 8
-    quantity_index = 7
-    value_index = 10
-    currency_index = 4
-    fee_index = 11
-    executed_at_index = 6
-    with instance.file.open('r') as file:
+    save_data_from_file(instance)
+    # asset_index = 5
+    # asset_type_index = 3
+    # price_index = 8
+    # quantity_index = 7
+    # value_index = 10
+    # currency_index = 4
+    # fee_index = 11
+    # executed_at_index = 6
+    # with instance.file.open('r') as file:
 
-        # NOTE close those in separated functions in logic file?
-        # RATES FILE
-        if instance.file.name.startswith("Rates"):
-            csvreader = csv.reader(file, delimiter=';')
-            for row in csvreader:
-                if len(row) == 0 or not re.match(r"^([\d]+)$", row[0]):
-                    continue
-                print(row)
+    #     # NOTE close those in separated functions in logic file?
+    #     # RATES FILE
+    #     if instance.file.name.startswith("Rates"):
+    #         csvreader = csv.reader(file, delimiter=';')
+    #         for row in csvreader:
+    #             if len(row) == 0 or not re.match(r"^([\d]+)$", row[0]):
+    #                 continue
+    #             print(row)
 
-                currency_rate, created = CurrencyRate.objects.get_or_create(
-                    date=datetime.strptime(row[0], '%Y%m%d'),
-                    defaults = {
-                        "usd": float(row[2].replace(",", ".")),
-                        "eur": float(row[8].replace(",", ".")),
-                        "gbp": float(row[11].replace(",", ".")),
-                        "rub": float(row[30].replace(",", ".")) if row[30] else None,
-                    }
-                )
-                print(currency_rate)
+    #             currency_rate, created = CurrencyRate.objects.get_or_create(
+    #                 date=datetime.strptime(row[0], '%Y%m%d'),
+    #                 defaults = {
+    #                     "usd": float(row[2].replace(",", ".")),
+    #                     "eur": float(row[8].replace(",", ".")),
+    #                     "gbp": float(row[11].replace(",", ".")),
+    #                     "rub": float(row[30].replace(",", ".")) if row[30] else None,
+    #                 }
+    #             )
+    #             print(currency_rate)
 
-        # BROKER FILE
-        elif instance.file.name.startswith("IB"):
-            csvreader = csv.reader(file)
-            for row in csvreader:
-                row_type = row[0]
+    #     # BROKER FILE
+    #     elif instance.file.name.startswith("IB"):
+    #         csvreader = csv.reader(file)
+    #         for row in csvreader:
+    #             row_type = row[0]
 
-                # TRANSACTION
-                if row_type == "Trades" and row[1] == "Data":
-                    print(row)
-                    # if jest numer konta to go usun
-                    if row[5].startswith("U"):
-                        del row[5]
+    #             # TRANSACTION
+    #             if row_type == "Trades" and row[1] == "Data":
+    #                 print(row)
+    #                 # if jest numer konta to go usun
+    #                 if row[5].startswith("U"):
+    #                     del row[5]
 
-                    # print("TRADE")
-                    # TODO make it atomic
-                    formatted_asset_type = row[asset_type_index].replace(" - Held with Interactive Brokers (U.K.) Limited carried by Interactive Brokers LLC", "").strip()
-                    print(formatted_asset_type)
-                    is_option = formatted_asset_type in ["Equity and Index Options"]
-                    executed_at = datetime.strptime(row[executed_at_index], '%Y-%m-%d, %H:%M:%S') + timedelta(hours=6)
-                    previous_day_currency_rate = CurrencyRate.objects.filter(date__lt=executed_at).order_by('-date').first()
-                    transaction, created = Transaction.objects.get_or_create(
-                        asset=row[asset_index],
-                        side="Buy" if float(row[quantity_index].replace(",", "")) > 0 else "Sell",
-                        # asset_type=row[asset_type_index],
-                        price=float(row[price_index]),
-                        quantity=float(row[quantity_index].replace(",", "")),
-                        # value=float(row[value_index]),
-                        # currency=row[currency_index],
-                        # fee=float(row[fee_index]),
-                        # option_type=get_option_type(row[asset_index]) if is_option else "",
-                        # strike_price=get_strike_price(row[asset_index]) if is_option else None,
-                        executed_at=datetime.strptime(row[executed_at_index], '%Y-%m-%d, %H:%M:%S') + timedelta(hours=6),
-                        defaults={
-                            'asset_type': formatted_asset_type,
-                            'value': float(row[value_index]),
-                            'value_pln': round(float(row[value_index]) * getattr(previous_day_currency_rate, row[currency_index].lower()), 2) if row[currency_index].lower() != "pln" else float(row[value_index]),
-                            'currency': row[currency_index],
-                            'previous_day_currency_rate': previous_day_currency_rate,
-                            'fee': float(row[fee_index]),
-                            'option_type': get_option_type(row[asset_index]) if is_option else "",
-                            'strike_price': get_strike_price(row[asset_index]) if is_option else None,
-                        }
-                    )
+    #                 # print("TRADE")
+    #                 # TODO make it atomic
+    #                 formatted_asset_type = row[asset_type_index].replace(" - Held with Interactive Brokers (U.K.) Limited carried by Interactive Brokers LLC", "").strip()
+    #                 print(formatted_asset_type)
+    #                 is_option = formatted_asset_type in ["Equity and Index Options"]
+    #                 executed_at = datetime.strptime(row[executed_at_index], '%Y-%m-%d, %H:%M:%S') + timedelta(hours=6)
+    #                 previous_day_currency_rate = CurrencyRate.objects.filter(date__lt=executed_at).order_by('-date').first()
+    #                 transaction, created = Transaction.objects.get_or_create(
+    #                     asset=row[asset_index],
+    #                     side="Buy" if float(row[quantity_index].replace(",", "")) > 0 else "Sell",
+    #                     # asset_type=row[asset_type_index],
+    #                     price=float(row[price_index]),
+    #                     quantity=float(row[quantity_index].replace(",", "")),
+    #                     # value=float(row[value_index]),
+    #                     # currency=row[currency_index],
+    #                     # fee=float(row[fee_index]),
+    #                     # option_type=get_option_type(row[asset_index]) if is_option else "",
+    #                     # strike_price=get_strike_price(row[asset_index]) if is_option else None,
+    #                     executed_at=datetime.strptime(row[executed_at_index], '%Y-%m-%d, %H:%M:%S') + timedelta(hours=6),
+    #                     defaults={
+    #                         'asset_type': formatted_asset_type,
+    #                         'value': float(row[value_index]),
+    #                         'value_pln': round(float(row[value_index]) * getattr(previous_day_currency_rate, row[currency_index].lower()), 2) if row[currency_index].lower() != "pln" else float(row[value_index]),
+    #                         'currency': row[currency_index],
+    #                         'previous_day_currency_rate': previous_day_currency_rate,
+    #                         'fee': float(row[fee_index]),
+    #                         'option_type': get_option_type(row[asset_index]) if is_option else "",
+    #                         'strike_price': get_strike_price(row[asset_index]) if is_option else None,
+    #                     }
+                    # )
 
 def update_tax_object(tax_year, revenue, cost, tax):
     previous_state, created = TaxSummary.objects.get_or_create(year=tax_year, defaults={
@@ -128,7 +125,7 @@ def calculate_tax_to_pay(sender, instance, *args, **kwargs):
     elif instance.asset_type == "Stocks" and instance.side == "Sell":
         closing_transaction = instance
         print(closing_transaction)
-        matching_transactions = Transaction.objects.filter(asset=closing_transaction.asset, side="Buy").order_by("executed_at")
+        matching_transactions = Transaction.objects.filter(asset_name=closing_transaction.asset_name, side="Buy").order_by("executed_at")
         print(matching_transactions)
         if len(matching_transactions) == 1:
             opening_transaction = matching_transactions[0]
