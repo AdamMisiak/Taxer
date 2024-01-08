@@ -1,4 +1,4 @@
-from transactions.models import ImportFile, Transaction, TaxCalculation, CurrencyRate
+from transactions.models import ImportFile, Transaction, TaxSummary, CurrencyRate, TaxCalculation
 from django.contrib import admin
 
 
@@ -15,9 +15,13 @@ class TransactionAdmin(admin.ModelAdmin):
     search_fields = ("asset", "asset_type")
     ordering = ("-executed_at", "asset", "fee", "quantity", "value", "value_pln")
 
-class TaxCalculationAdmin(admin.ModelAdmin):
+class TaxSummaryAdmin(admin.ModelAdmin):
     list_display = ("year", "tax", "revenue", "cost")
     ordering = ("-year", "tax", "revenue", "cost")
+
+class TaxCalculationAdmin(admin.ModelAdmin):
+    list_display = ("id", "opening_transaction", "closing_transaction", "tax", "revenue", "profit_or_loss", "cost")
+    ordering = ("tax", "revenue", "profit_or_loss", "cost")
 
 class CurrencyRateAdmin(admin.ModelAdmin):
     list_display = ("date", "usd", "eur", "gbp")
@@ -26,4 +30,5 @@ class CurrencyRateAdmin(admin.ModelAdmin):
 admin.site.register(ImportFile, ImportFileAdmin)
 admin.site.register(Transaction, TransactionAdmin)
 admin.site.register(CurrencyRate, CurrencyRateAdmin)
+admin.site.register(TaxSummary, TaxSummaryAdmin)
 admin.site.register(TaxCalculation, TaxCalculationAdmin)

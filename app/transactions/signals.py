@@ -3,7 +3,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 import csv
 from datetime import datetime, timedelta
-from transactions.models import ImportFile, Transaction, TaxCalculation, CurrencyRate
+from transactions.models import ImportFile, Transaction, TaxSummary, CurrencyRate, TaxCalculation
 import re
 from django.conf import settings
 
@@ -90,12 +90,12 @@ def save_transactions_from_the_file(sender, instance, *args, **kwargs):
                     )
 
 def update_tax_object(tax_year, revenue, cost, tax):
-    previous_state, created = TaxCalculation.objects.get_or_create(year=tax_year, defaults={
+    previous_state, created = TaxSummary.objects.get_or_create(year=tax_year, defaults={
         'revenue': 0,
         'cost': 0,
         'tax': 0
     })
-    tax_object, created = TaxCalculation.objects.update_or_create(
+    tax_object, created = TaxSummary.objects.update_or_create(
         year=tax_year,
         defaults={
             'revenue': round(previous_state.revenue+revenue, 2),
@@ -130,7 +130,6 @@ def calculate_tax_to_pay(sender, instance, *args, **kwargs):
         print(closing_transaction)
         matching_transactions = Transaction.objects.filter(asset=closing_transaction.asset, side="Buy").order_by("executed_at")
         print(matching_transactions)
-        # NOTE gdzie zapisywac info ze transakcja juz rozliczona? nowy model match transakcji?
         if len(matching_transactions) == 1:
             opening_transaction = matching_transactions[0]
             # NOTE make quantity abs when saving transactions? instead of here everytime?
@@ -142,6 +141,14 @@ def calculate_tax_to_pay(sender, instance, *args, **kwargs):
                 print(closing_transaction.value_pln)
                 print(profit_or_loss)
                 print(tax_to_pay_from_transaction)
+                TaxCalculation.objects.create(
+                    opening_transaction=opening_transaction,
+                    closing_transaction=closing_transaction,
+                    revenue=closing_transaction.value_pln,
+                    cost=opening_transaction.value_pln,
+                    profit_or_loss=profit_or_loss,
+                    tax=tax_to_pay_from_transaction
+                )
                 update_tax_object(tax_year, closing_transaction.value_pln, opening_transaction.value_pln, tax_to_pay_from_transaction)
 
         elif len(matching_transactions) > 1:

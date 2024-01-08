@@ -1,11 +1,19 @@
 
 from django.db import models
-
+from .transaction import Transaction
 
 class TaxCalculation(models.Model):
-    year = models.IntegerField(unique=True)
+    opening_transaction = models.ForeignKey(
+        Transaction, related_name="as_opening_calculation",
+        on_delete=models.RESTRICT, blank=True, null=True
+    )
+    closing_transaction = models.ForeignKey(
+        Transaction, related_name="as_closing_calculation",
+        on_delete=models.RESTRICT, blank=True, null=True
+    )
     revenue = models.FloatField()
     cost = models.FloatField()
+    profit_or_loss = models.FloatField()
     tax = models.FloatField()
 
     class Meta:
@@ -14,4 +22,4 @@ class TaxCalculation(models.Model):
 
 
     def __str__(self):
-        return f"{self.year} - {self.tax}"
+        return f"{self.opening_transaction} - {self.closing_transaction}"
