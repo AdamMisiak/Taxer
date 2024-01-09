@@ -1,5 +1,6 @@
 from django.db import models
 from .currency_rate import CurrencyRate
+from django.utils.html import format_html
 
 SIDE_CHOICES = [
     ("Buy", "Buy"),
@@ -60,6 +61,7 @@ class Transaction(models.Model):
     )
     strike_price = models.FloatField(null=True, blank=True)
 
+    # NOTE change to the time zone aware 
     executed_at = models.DateTimeField()
 
     class Meta:
@@ -67,10 +69,19 @@ class Transaction(models.Model):
         verbose_name_plural = "Transactions"
         unique_together = ('asset_name', 'side', "price", "quantity", "executed_at")
 
+    def colored_side(self):
+        color_code = "008000" if self.side == "Buy" else "D2042D"
+        return format_html(
+            f'<span style="color: #{color_code};">{self.side}</span>'
+        )
 
     def __str__(self):
         return f"{self.side} {self.quantity} {self.asset_name} @ {self.price} {self.currency} - {self.executed_at.date()}"
 
     def save(self, *args, **kwargs):
-        print(f"ℹ️  Created Transaction object: {self}")
+        # NOTE add different message when updating with different 
+        if self.id is not None:
+            print(f"🆕 Updated Transaction object: {self}")
+        else:
+            print(f"✅ Created Transaction object: {self}")
         super(Transaction, self).save(*args, **kwargs)

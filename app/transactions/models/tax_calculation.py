@@ -14,6 +14,7 @@ class TaxCalculation(models.Model):
     revenue = models.FloatField()
     cost = models.FloatField()
     profit_or_loss = models.FloatField()
+    # NOTE add tax rate here with 0.19 default
     tax = models.FloatField()
 
     class Meta:
@@ -22,4 +23,9 @@ class TaxCalculation(models.Model):
 
 
     def __str__(self):
-        return f"{self.opening_transaction} - {self.closing_transaction}"
+        return f"{self.opening_transaction} - {self.closing_transaction} - tax: {self.tax} PLN"
+
+
+    def save(self, *args, **kwargs):
+        print(f"✅ Created TaxCalculation object: {self}")
+        super(Transaction, self).save(*args, **kwargs)

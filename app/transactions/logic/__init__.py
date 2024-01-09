@@ -1,3 +1,4 @@
 from .currency_rate import save_data_currency_rates_file
-from .signal import save_data_from_file
+from .signal import save_data_from_file, calculate_tax_to_pay
 from .transaction import save_data_ib_broker_file
+from .tax_calculation import calculate_tax_option, calculate_tax_equity

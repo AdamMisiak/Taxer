@@ -24,13 +24,14 @@ def _save_transaction_object(row):
 
     asset_name = row[asset_name_index]
     asset_type = row[asset_type_index].replace(" - Held with Interactive Brokers (U.K.) Limited carried by Interactive Brokers LLC", "").strip()
-    quantity = float(row[quantity_index].replace(',',''))
-    side = "Buy" if quantity > 0 else "Sell"
+    quantity_raw = float(row[quantity_index].replace(',',''))
+    side = "Buy" if quantity_raw > 0 else "Sell"
+    quantity = abs(quantity_raw)
     currency = row[currency_index]
     price = float(row[price_index])
-    value = float(row[value_index])
+    value = abs(float(row[value_index]))
     value_pln = round(value * getattr(previous_day_currency_rate, currency.lower()), 2) if row[currency_index].lower() != "pln" else value
-    fee = float(row[fee_index])
+    fee = abs(float(row[fee_index]))
     is_option = asset_type == "Equity and Index Options"
 
     Transaction.objects.get_or_create(

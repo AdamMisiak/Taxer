@@ -10,7 +10,7 @@ class ImportFileAdmin(admin.ModelAdmin):
 
 
 class TransactionAdmin(admin.ModelAdmin):
-    list_display = ("asset_name", "side", "asset_type", "price", "quantity", "value", "value_pln", "currency", "fee", "executed_at")
+    list_display = ("asset_name", "colored_side", "asset_type", "price", "quantity", "value", "value_pln", "currency", "fee", "executed_at")
     list_filter = ("side", "asset_type", "currency")
     search_fields = ("asset_name", "asset_type")
     ordering = ("-executed_at", "asset_name", "fee", "quantity", "value", "value_pln")
