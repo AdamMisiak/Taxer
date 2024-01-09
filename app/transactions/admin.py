@@ -6,14 +6,14 @@ class ImportFileAdmin(admin.ModelAdmin):
     list_display = ("id", "file", "created_at")
 
 class TaxCalculationOpeningInline(admin.StackedInline):
-    verbose_name = "Tax Calculations Opening"
+    verbose_name_plural = "Tax Opening Calculations"
     model = TaxCalculation
     fk_name = "opening_transaction"
     extra = 0
 
 
 class TaxCalculationClosingInline(admin.StackedInline):
-    verbose_name = "Tax Calculations Closing"
+    verbose_name_plural = "Tax Closing Calculations"
     model = TaxCalculation
     fk_name = "closing_transaction"
     extra = 0
@@ -53,8 +53,8 @@ class TaxCalculationAdmin(admin.ModelAdmin):
         "closing_transaction",
         "tax",
         "revenue",
-        "profit_or_loss",
         "cost",
+        "profit_or_loss",
     )
     ordering = ("tax", "revenue", "profit_or_loss", "cost")
 

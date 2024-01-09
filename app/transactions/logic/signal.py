@@ -49,4 +49,5 @@ def calculate_tax_to_pay(transaction_instance: Transaction):
     elif transaction_instance.asset_type in ["Stocks", "ETFs"] and transaction_instance.side == "Sell":
         calculate_tax_equity(transaction_instance)
 
+    # DIVIDEND
     # calculate_tax_dividend

@@ -34,15 +34,17 @@ def _save_transaction_object(row):
         )
         .strip()
     )
+    # Creating raw quantity (negative or positive) to determine side of the transaction
     quantity_raw = float(row[quantity_index].replace(",", ""))
     side = "Buy" if quantity_raw > 0 else "Sell"
     quantity = abs(quantity_raw)
     currency = row[currency_index]
-    price = float(row[price_index])
-    value = abs(float(row[value_index]))
+    # NOTE Watch of for forex records
+    price = round(float(row[price_index]), 2)
+    value = round(abs(float(row[value_index])), 2)
     value_pln = (
         round(value * getattr(previous_day_currency_rate, currency.lower()), 2)
-        if row[currency_index].lower() != "pln"
+        if currency.lower() != "pln"
         else value
     )
     fee = abs(float(row[fee_index]))
