@@ -4,27 +4,34 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('transactions', '0002_transaction_previous_day_currency_rate_and_more'),
+        ("transactions", "0002_transaction_previous_day_currency_rate_and_more"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='TaxCalculation',
+            name="TaxCalculation",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('year', models.IntegerField(unique=True)),
-                ('revenue', models.FloatField()),
-                ('cost', models.FloatField()),
-                ('tax', models.FloatField()),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("year", models.IntegerField(unique=True)),
+                ("revenue", models.FloatField()),
+                ("cost", models.FloatField()),
+                ("tax", models.FloatField()),
             ],
             options={
-                'verbose_name': 'Tax calculation',
-                'verbose_name_plural': 'Tax calculations',
+                "verbose_name": "Tax calculation",
+                "verbose_name_plural": "Tax calculations",
             },
         ),
         migrations.DeleteModel(
-            name='Tax',
+            name="Tax",
         ),
     ]

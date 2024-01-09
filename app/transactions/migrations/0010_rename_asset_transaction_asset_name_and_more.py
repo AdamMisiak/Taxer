@@ -4,19 +4,18 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('transactions', '0009_taxcalculation_profit_or_loss'),
+        ("transactions", "0009_taxcalculation_profit_or_loss"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='transaction',
-            old_name='asset',
-            new_name='asset_name',
+            model_name="transaction",
+            old_name="asset",
+            new_name="asset_name",
         ),
         migrations.AlterUniqueTogether(
-            name='transaction',
-            unique_together={('asset_name', 'side', 'price', 'quantity', 'executed_at')},
+            name="transaction",
+            unique_together={("asset_name", "side", "price", "quantity", "executed_at")},
         ),
     ]

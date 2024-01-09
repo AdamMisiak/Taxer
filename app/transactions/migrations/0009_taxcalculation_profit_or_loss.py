@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('transactions', '0008_remove_taxcalculation_transaction_and_more'),
+        ("transactions", "0008_remove_taxcalculation_transaction_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='taxcalculation',
-            name='profit_or_loss',
+            model_name="taxcalculation",
+            name="profit_or_loss",
             field=models.FloatField(default=0),
             preserve_default=False,
         ),

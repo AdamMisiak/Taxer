@@ -5,19 +5,23 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('transactions', '0006_rename_transaction_taxcalculation_transactions'),
+        ("transactions", "0006_rename_transaction_taxcalculation_transactions"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='taxcalculation',
-            name='transactions',
+            model_name="taxcalculation",
+            name="transactions",
         ),
         migrations.AddField(
-            model_name='taxcalculation',
-            name='transaction',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.RESTRICT, to='transactions.transaction'),
+            model_name="taxcalculation",
+            name="transaction",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.RESTRICT,
+                to="transactions.transaction",
+            ),
         ),
     ]

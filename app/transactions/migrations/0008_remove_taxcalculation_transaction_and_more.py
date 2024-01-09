@@ -5,24 +5,35 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('transactions', '0007_remove_taxcalculation_transactions_and_more'),
+        ("transactions", "0007_remove_taxcalculation_transactions_and_more"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='taxcalculation',
-            name='transaction',
+            model_name="taxcalculation",
+            name="transaction",
         ),
         migrations.AddField(
-            model_name='taxcalculation',
-            name='closing_transaction',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.RESTRICT, related_name='as_closing_calculation', to='transactions.transaction'),
+            model_name="taxcalculation",
+            name="closing_transaction",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.RESTRICT,
+                related_name="as_closing_calculation",
+                to="transactions.transaction",
+            ),
         ),
         migrations.AddField(
-            model_name='taxcalculation',
-            name='opening_transaction',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.RESTRICT, related_name='as_opening_calculation', to='transactions.transaction'),
+            model_name="taxcalculation",
+            name="opening_transaction",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.RESTRICT,
+                related_name="as_opening_calculation",
+                to="transactions.transaction",
+            ),
         ),
     ]

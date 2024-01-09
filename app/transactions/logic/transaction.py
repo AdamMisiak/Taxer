@@ -1,13 +1,16 @@
 import csv
 from datetime import datetime, timedelta
-from transactions.models import Transaction, CurrencyRate
+
+from transactions.models import CurrencyRate, Transaction
 
 
 def _get_option_type(option_name: str) -> str:
     return "CALL" if option_name[-1] == "C" else "PUT"
 
+
 def _get_strike_price(option_name: str) -> float:
     return float(option_name.split()[-2])
+
 
 def _save_transaction_object(row):
     asset_name_index = 5
@@ -19,18 +22,29 @@ def _save_transaction_object(row):
     fee_index = 11
     executed_at_index = 6
 
-    executed_at = datetime.strptime(row[executed_at_index], '%Y-%m-%d, %H:%M:%S') + timedelta(hours=6)
-    previous_day_currency_rate = CurrencyRate.objects.filter(date__lt=executed_at).order_by('-date').first()
+    executed_at = datetime.strptime(row[executed_at_index], "%Y-%m-%d, %H:%M:%S") + timedelta(hours=6)
+    previous_day_currency_rate = CurrencyRate.objects.filter(date__lt=executed_at).order_by("-date").first()
 
     asset_name = row[asset_name_index]
-    asset_type = row[asset_type_index].replace(" - Held with Interactive Brokers (U.K.) Limited carried by Interactive Brokers LLC", "").strip()
-    quantity_raw = float(row[quantity_index].replace(',',''))
+    asset_type = (
+        row[asset_type_index]
+        .replace(
+            " - Held with Interactive Brokers (U.K.) Limited carried by Interactive Brokers LLC",
+            "",
+        )
+        .strip()
+    )
+    quantity_raw = float(row[quantity_index].replace(",", ""))
     side = "Buy" if quantity_raw > 0 else "Sell"
     quantity = abs(quantity_raw)
     currency = row[currency_index]
     price = float(row[price_index])
     value = abs(float(row[value_index]))
-    value_pln = round(value * getattr(previous_day_currency_rate, currency.lower()), 2) if row[currency_index].lower() != "pln" else value
+    value_pln = (
+        round(value * getattr(previous_day_currency_rate, currency.lower()), 2)
+        if row[currency_index].lower() != "pln"
+        else value
+    )
     fee = abs(float(row[fee_index]))
     is_option = asset_type == "Equity and Index Options"
 
@@ -41,17 +55,16 @@ def _save_transaction_object(row):
         quantity=quantity,
         executed_at=executed_at,
         defaults={
-            'asset_type': asset_type,
-            'value': value,
-            'value_pln': value_pln,
-            'currency': currency,
-            'previous_day_currency_rate': previous_day_currency_rate,
-            'fee': fee,
-            'option_type': _get_option_type(asset_name) if is_option else "",
-            'strike_price': _get_strike_price(asset_name) if is_option else None,
-        }
+            "asset_type": asset_type,
+            "value": value,
+            "value_pln": value_pln,
+            "currency": currency,
+            "previous_day_currency_rate": previous_day_currency_rate,
+            "fee": fee,
+            "option_type": _get_option_type(asset_name) if is_option else "",
+            "strike_price": _get_strike_price(asset_name) if is_option else None,
+        },
     )
-
 
 
 def save_data_ib_broker_file(file):

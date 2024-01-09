@@ -5,20 +5,31 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('transactions', '0011_alter_taxcalculation_closing_transaction_and_more'),
+        ("transactions", "0011_alter_taxcalculation_closing_transaction_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='taxcalculation',
-            name='closing_transaction',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='as_closing_calculation', to='transactions.transaction'),
+            model_name="taxcalculation",
+            name="closing_transaction",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="as_closing_calculation",
+                to="transactions.transaction",
+            ),
         ),
         migrations.AlterField(
-            model_name='taxcalculation',
-            name='opening_transaction',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='as_opening_calculation', to='transactions.transaction'),
+            model_name="taxcalculation",
+            name="opening_transaction",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="as_opening_calculation",
+                to="transactions.transaction",
+            ),
         ),
     ]

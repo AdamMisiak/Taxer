@@ -1,4 +1,3 @@
-
 from django.db import models
 
 
@@ -12,7 +11,6 @@ class CurrencyRate(models.Model):
     class Meta:
         verbose_name = "Currency rate"
         verbose_name_plural = "Currency rates"
-
 
     def __str__(self):
         return f"{self.date} - {self.usd} USD"

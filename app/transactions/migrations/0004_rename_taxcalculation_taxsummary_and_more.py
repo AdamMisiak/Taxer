@@ -4,18 +4,20 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('transactions', '0003_taxcalculation_delete_tax'),
+        ("transactions", "0003_taxcalculation_delete_tax"),
     ]
 
     operations = [
         migrations.RenameModel(
-            old_name='TaxCalculation',
-            new_name='TaxSummary',
+            old_name="TaxCalculation",
+            new_name="TaxSummary",
         ),
         migrations.AlterModelOptions(
-            name='taxsummary',
-            options={'verbose_name': 'Tax summary', 'verbose_name_plural': 'Tax summary'},
+            name="taxsummary",
+            options={
+                "verbose_name": "Tax summary",
+                "verbose_name_plural": "Tax summary",
+            },
         ),
     ]

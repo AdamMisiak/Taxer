@@ -4,24 +4,31 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('transactions', '0004_rename_taxcalculation_taxsummary_and_more'),
+        ("transactions", "0004_rename_taxcalculation_taxsummary_and_more"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='TaxCalculation',
+            name="TaxCalculation",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('revenue', models.FloatField()),
-                ('cost', models.FloatField()),
-                ('tax', models.FloatField()),
-                ('transaction', models.ManyToManyField(to='transactions.transaction')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("revenue", models.FloatField()),
+                ("cost", models.FloatField()),
+                ("tax", models.FloatField()),
+                ("transaction", models.ManyToManyField(to="transactions.transaction")),
             ],
             options={
-                'verbose_name': 'Tax calculation',
-                'verbose_name_plural': 'Tax calculations',
+                "verbose_name": "Tax calculation",
+                "verbose_name_plural": "Tax calculations",
             },
         ),
     ]
