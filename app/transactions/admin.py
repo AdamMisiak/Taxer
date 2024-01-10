@@ -8,14 +8,14 @@ class ImportFileAdmin(admin.ModelAdmin):
 class TaxCalculationOpeningInline(admin.StackedInline):
     verbose_name_plural = "Tax Opening Calculations"
     model = TaxCalculation
-    fk_name = "opening_transaction"
+    fk_name = "closing_transaction"
     extra = 0
 
 
 class TaxCalculationClosingInline(admin.StackedInline):
     verbose_name_plural = "Tax Closing Calculations"
     model = TaxCalculation
-    fk_name = "closing_transaction"
+    fk_name = "opening_transaction"
     extra = 0
 
 

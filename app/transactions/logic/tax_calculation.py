@@ -6,10 +6,13 @@ def calculate_tax_dividend(transaction_instance: Transaction):
     pass
 
 def _calculate_tax_option_sell(transaction_instance: Transaction):
+    from transactions.logic import _update_tax_summary
+
     tax_year = transaction_instance.executed_at.year
     premium_pln = transaction_instance.value_pln
     tax_to_pay_from_transaction = round(premium_pln * settings.TAX_RATE, 2)
 
+    # NOTE add fk connection to the tax summary ?
     TaxCalculation.objects.create(
         closing_transaction=transaction_instance,
         revenue=premium_pln,
@@ -18,16 +21,19 @@ def _calculate_tax_option_sell(transaction_instance: Transaction):
         tax=tax_to_pay_from_transaction,
     )
 
-    # _update_tax_summary_equity(
-    #     tax_year=tax_year,
-    #     revenue=closing_transaction.value_pln,
-    #     cost=opening_transaction.value_pln,
-    #     tax=tax_to_pay_from_transaction,
-    # )
+    _update_tax_summary(
+        tax_year=tax_year,
+        revenue=premium_pln,
+        cost=0,
+        tax=tax_to_pay_from_transaction,
+    )
 
+# NOTE Opcje też łączyć w pary - nie zostawiać pustych open i closed trranssction - expired tez ma record w bazie 
 def _calculate_tax_option_buy(transaction_instance: Transaction):
+    from transactions.logic import _update_tax_summary
+
     tax_year = transaction_instance.executed_at.year
-    premium_pln = transaction_instance.value_pln
+    premium_pln = round(transaction_instance.value_pln, 2)
     tax_to_pay_from_transaction = round(premium_pln * settings.TAX_RATE, 2)
 
     TaxCalculation.objects.create(
@@ -38,31 +44,32 @@ def _calculate_tax_option_buy(transaction_instance: Transaction):
         tax=-tax_to_pay_from_transaction,
     )
 
-    # _update_tax_summary_equity(
-    #     tax_year=tax_year,
-    #     revenue=closing_transaction.value_pln,
-    #     cost=opening_transaction.value_pln,
-    #     tax=tax_to_pay_from_transaction,
-    # )
+    _update_tax_summary(
+        tax_year=tax_year,
+        revenue=0,
+        cost=premium_pln,
+        tax=tax_to_pay_from_transaction,
+    )
 
 def calculate_tax_option(transaction_instance: Transaction):
-    from transactions.logic import _update_tax_summary_equity
-
+    from transactions.logic import _update_tax_summary
+    
+    tax_year = transaction_instance.executed_at.year
     if not transaction_instance.as_opening_calculation.all() and not transaction_instance.as_closing_calculation.all():
+        # NOTE separated buy and sell bc when it was integrated sell was first and when creating tax instance, buy/expire was not there yet
         if transaction_instance.side == "Sell":
             _calculate_tax_option_sell(transaction_instance)
-        # NOTE check if price is not 0? = expired OR new field for transcation
         elif transaction_instance.side == "Buy":
             _calculate_tax_option_buy(transaction_instance)
     else:
         print("⚠️  Option is already included in the tax calculations!")
-        
+
     # update_tax_object(tax_year, tax_to_pay_from_transaction)
 
 
 
 def _calculate_tax_equity_one_transaction(opening_transaction: Transaction, closing_transaction: Transaction):
-    from transactions.logic import _update_tax_summary_equity
+    from transactions.logic import _update_tax_summary
 
     tax_year = closing_transaction.executed_at.year
     profit_or_loss = round(closing_transaction.value_pln - opening_transaction.value_pln, 2)
@@ -76,7 +83,7 @@ def _calculate_tax_equity_one_transaction(opening_transaction: Transaction, clos
         profit_or_loss=profit_or_loss,
         tax=tax_to_pay_from_transaction,
     )
-    _update_tax_summary_equity(
+    _update_tax_summary(
         tax_year=tax_year,
         revenue=closing_transaction.value_pln,
         cost=opening_transaction.value_pln,
