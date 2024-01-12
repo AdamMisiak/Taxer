@@ -20,6 +20,7 @@ class TaxCalculationClosingInline(admin.StackedInline):
 
 
 class TransactionAdmin(admin.ModelAdmin):
+    date_hierarchy="executed_at"
     list_display = (
         "asset_name",
         "colored_side",
@@ -32,7 +33,7 @@ class TransactionAdmin(admin.ModelAdmin):
         "fee",
         "executed_at",
     )
-    list_filter = ("side", "asset_type", "currency")
+    list_filter = ("side", "asset_type", "currency", "executed_at")
     search_fields = ("asset_name", "asset_type")
     ordering = ("-executed_at", "asset_name", "fee", "quantity", "value", "value_pln")
     inlines = [
@@ -55,13 +56,14 @@ class TaxCalculationAdmin(admin.ModelAdmin):
         "revenue",
         "cost",
         "profit_or_loss",
+        "quantity"
     )
     ordering = ("tax", "revenue", "profit_or_loss", "cost")
 
 
 class CurrencyRateAdmin(admin.ModelAdmin):
-    list_display = ("date", "usd", "eur", "gbp")
-    ordering = ("-date", "usd", "eur", "gbp")
+    list_display = ("date", "usd", "eur", "gbp", "chf")
+    ordering = ("-date", "usd", "eur", "gbp", "chf")
 
 
 admin.site.register(ImportFile, ImportFileAdmin)

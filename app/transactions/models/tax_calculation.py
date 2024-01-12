@@ -1,10 +1,17 @@
 from django.db import models
 
 from .transaction import Transaction
+from .tax_summary import TaxSummary
 
 
 class TaxCalculation(models.Model):
-    # NOTE link tax summary here?
+    tax_summary = models.ForeignKey(
+        TaxSummary,
+        related_name="tax_calculations",
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+    )
     opening_transaction = models.ForeignKey(
         Transaction,
         related_name="as_opening_calculation",
@@ -22,8 +29,9 @@ class TaxCalculation(models.Model):
     revenue = models.FloatField()
     cost = models.FloatField()
     profit_or_loss = models.FloatField()
-    # NOTE add tax rate here with 0.19 default
     tax = models.FloatField()
+    tax_rate = models.FloatField(default=0.19)
+    quantity = models.FloatField(blank=True, null=True)
 
     class Meta:
         verbose_name = "Tax calculation"
@@ -33,5 +41,8 @@ class TaxCalculation(models.Model):
         return f"{self.opening_transaction} <> {self.closing_transaction} Tax: {self.tax} PLN"
 
     def save(self, *args, **kwargs):
-        print(f"✅ Created TaxCalculation object: {self}")
+        if self.id is not None:
+            print(f"🆕 Updated TaxCalculation object: {self}")
+        else:
+            print(f"✅ Created TaxCalculation object: {self}")
         super(TaxCalculation, self).save(*args, **kwargs)

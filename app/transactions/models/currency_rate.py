@@ -6,6 +6,7 @@ class CurrencyRate(models.Model):
     usd = models.FloatField()
     eur = models.FloatField()
     gbp = models.FloatField()
+    chf = models.FloatField()
     rub = models.FloatField(null=True, blank=True)
 
     class Meta:

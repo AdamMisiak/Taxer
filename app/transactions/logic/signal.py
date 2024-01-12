@@ -7,11 +7,14 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from transactions.models import CurrencyRate, ImportFile, TaxCalculation, TaxSummary, Transaction
 
-
 def save_data_from_file(import_file_instance: ImportFile):
-    from transactions.logic import save_data_currency_rates_file, save_data_ib_broker_file
+    from transactions.logic import save_data_currency_rates_file, save_data_ib_broker_file, _init_tax_summary
 
     with import_file_instance.file.open("r") as file:
+        # TaxSummary init
+        tax_year = int(str(import_file_instance.file).split("_")[1])
+        _init_tax_summary(tax_year)
+
         # RATES FILE
         if import_file_instance.file.name.startswith("Rates"):
             save_data_currency_rates_file(file)
