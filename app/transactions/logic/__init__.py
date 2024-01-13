@@ -1,5 +1,5 @@
 from .currency_rate import save_data_currency_rates_file
 from .signal import calculate_tax_to_pay, save_data_from_file
 from .tax_calculation import calculate_tax_dividend, calculate_tax_equity, calculate_tax_option
-from .tax_summary import _update_tax_summary
+from .tax_summary import _update_tax_summary, _init_tax_summary
 from .transaction import save_data_ib_broker_file

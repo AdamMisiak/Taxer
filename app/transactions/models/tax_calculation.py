@@ -38,7 +38,8 @@ class TaxCalculation(models.Model):
         verbose_name_plural = "Tax calculations"
 
     def __str__(self):
-        return f"{self.opening_transaction} <> {self.closing_transaction} Tax: {self.tax} PLN"
+        custom_quantity = f"Custom quantity: {self.quantity}" if self.quantity is not None else ""
+        return f"{self.opening_transaction} <> {self.closing_transaction} {custom_quantity} Tax: {self.tax} PLN"
 
     def save(self, *args, **kwargs):
         if self.id is not None:
