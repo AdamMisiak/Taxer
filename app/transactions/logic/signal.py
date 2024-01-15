@@ -23,24 +23,6 @@ def save_data_from_file(import_file_instance: ImportFile):
         elif import_file_instance.file.name.startswith("IB"):
             save_data_ib_broker_file(file)
 
-
-# def update_tax_object(tax_year, revenue, cost, tax):
-#     previous_state, created = TaxSummary.objects.get_or_create(year=tax_year, defaults={
-#         'revenue': 0,
-#         'cost': 0,
-#         'tax': 0
-#     })
-#     tax_object, created = TaxSummary.objects.update_or_create(
-#         year=tax_year,
-#         defaults={
-#             'revenue': round(previous_state.revenue+revenue, 2),
-#             'cost': round(previous_state.cost+cost, 2),
-#             'tax': round(previous_state.tax+tax, 2)
-#         }
-#     )
-#     print(tax_object.tax)
-
-
 def calculate_tax_to_pay(transaction_instance: Transaction):
     from transactions.logic import calculate_tax_dividend, calculate_tax_equity, calculate_tax_option
 
