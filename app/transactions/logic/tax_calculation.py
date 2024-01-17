@@ -144,33 +144,33 @@ def _handle_few_transactions_equal_quantity_use_case(matching_transactions, clos
     summary_opening_transaction_quantity = 0
 
     for transaction in matching_transactions:
-        print(transaction.quantity)
-        print(closing_transaction.quantity)
         # NOTE this can be calculated only for first found transaction with same quantity (FIFO rule)
         if summary_opening_transaction_quantity == 0 and transaction.quantity == closing_transaction.quantity and not transaction.as_opening_calculation.all() and not closing_transaction.as_opening_calculation.all():
-            print("match i break??")
+            print(f"ℹ️  Used first transaction with matching quantity: {transaction}")
             _calculate_tax_equity_same_quantity(transaction, closing_transaction)
             break
-        if transaction.quantity < closing_transaction.quantity and not transaction.as_opening_calculation.all():
-            print('MATCH')
+
+        elif transaction.quantity < closing_transaction.quantity and not transaction.as_opening_calculation.all():
             if summary_opening_transaction_quantity + transaction.quantity > closing_transaction.quantity:
                 quantity = _get_partial_quantity_for_transaction(closing_transaction.quantity, summary_opening_transaction_quantity)
+                print(f"ℹ️  Used last partial transaction with {quantity} quantity: {transaction}")
                 _calculate_tax_equity_partial_different_quantity(transaction, closing_transaction, quantity)
                 break
             else:
                 summary_opening_transaction_quantity += transaction.quantity
+                print(f"ℹ️  Used middle transaction: {transaction}")
                 _calculate_tax_equity_partial_different_quantity(transaction, closing_transaction)
 
 def calculate_tax_equity(transaction_instance: Transaction):
-    tax_year = transaction_instance.executed_at.year
     closing_transaction = transaction_instance
+    print(f"ℹ️  Searching matching transactions for closing transaction: {closing_transaction}")
 
     matching_transactions = Transaction.objects.filter(asset_name=closing_transaction.asset_name, side="Buy", executed_at__lte=closing_transaction.executed_at).order_by(
         "executed_at"
     )
     number_of_matching_transactions = len(matching_transactions)
     print(f"ℹ️  Found {number_of_matching_transactions} matching transaction(s)")
-    print(f"ℹ️  Found transaction(s): {matching_transactions}")
+    print(f"ℹ️  Found transaction(s): {matching_transactions}\n")
 
     if number_of_matching_transactions == 1:
         _handle_one_transaction_use_case(opening_transaction=matching_transactions[0], closing_transaction=closing_transaction)

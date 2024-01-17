@@ -8,7 +8,7 @@ def _init_tax_summary(tax_year: int):
 def _update_tax_summary(tax_year, revenue, cost, tax):
     _init_tax_summary(tax_year)
 
-    print(f"ℹ️  Updated TaxSummary object with revenue: {revenue}, cost: {cost} and tax: {tax}")
+    print(f"ℹ️  Updated TaxSummary object with revenue: {revenue}, cost: {cost} and tax: {tax}\n")
     TaxSummary.objects.filter(year=tax_year).update(
         revenue=F("revenue") + revenue, cost=F("cost") + cost, tax=F("tax") + tax
     )

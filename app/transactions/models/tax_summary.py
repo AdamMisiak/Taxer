@@ -16,7 +16,7 @@ class TaxSummary(models.Model):
 
     def save(self, *args, **kwargs):
         if self.id is not None:
-            print(f"🆕 Updated TaxSummary object: {self}")
+            print(f"🆕 Updated TaxSummary object: {self}\n")
         else:
-            print(f"✅ Created TaxSummary object: {self}")
+            print(f"✅ Created TaxSummary object: {self}\n")
         super(TaxSummary, self).save(*args, **kwargs)
