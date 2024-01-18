@@ -11,6 +11,12 @@ def _get_option_type(option_name: str) -> str:
 def _get_strike_price(option_name: str) -> float:
     return float(option_name.split()[-2])
 
+def _validate_row_ib_broker_file(row):
+    if row[5].startswith("U") and row[5][1:].isnumeric():
+        del row[5]
+
+    if row[3].startswith("Forex") and row[5].startswith("20") and len(row) == 16:
+        row.insert(5, "")
 
 def _save_transaction_object(row):
     asset_name_index = 5
@@ -68,19 +74,16 @@ def _save_transaction_object(row):
         },
     )
 
-
 def save_data_ib_broker_file(file):
     csvreader = csv.reader(file)
 
     for row in csvreader:
         row_type = row[0]
+        # NOTE transactions has to be chronogically!!!
 
         # TRANSACTION
         if row_type == "Trades" and row[1] == "Data":
-            if row[5].startswith("U"):
-                del row[5]
-
-            # TODO make it atomic?
+            _validate_row_ib_broker_file(row)
             _save_transaction_object(row)
 
         # DIVIDEND

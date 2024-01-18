@@ -40,8 +40,11 @@ def calculate_tax_to_pay(transaction_instance: Transaction):
 def update_tax_summary_for_year(tax_calculation_instance: TaxCalculation):
     from transactions.logic import update_tax_summary
 
-    # NOTE check this part!
-    tax_year = tax_calculation_instance.closing_transaction.executed_at.year or tax_calculation_instance.opening_transaction.executed_at.year
+    if tax_calculation_instance.closing_transaction:
+        tax_year = tax_calculation_instance.closing_transaction.executed_at.year
+    elif tax_calculation_instance.opening_transaction:
+        tax_year = tax_calculation_instance.opening_transaction.executed_at.year
+        
     update_tax_summary(
         tax_year=tax_year,
         revenue=tax_calculation_instance.revenue,
