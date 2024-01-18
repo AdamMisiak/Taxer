@@ -6,7 +6,6 @@ def calculate_tax_dividend(transaction_instance: Transaction):
     pass
 
 def _calculate_tax_option_sell(transaction_instance: Transaction):
-    from transactions.logic import _update_tax_summary
 
     tax_year = transaction_instance.executed_at.year
     premium_pln = transaction_instance.value_pln
@@ -21,16 +20,9 @@ def _calculate_tax_option_sell(transaction_instance: Transaction):
         tax=tax_to_pay_from_transaction,
     )
 
-    _update_tax_summary(
-        tax_year=tax_year,
-        revenue=premium_pln,
-        cost=0,
-        tax=tax_to_pay_from_transaction,
-    )
 
 # NOTE Opcje też łączyć w pary - nie zostawiać pustych open i closed trranssction - expired tez ma record w bazie 
 def _calculate_tax_option_buy(transaction_instance: Transaction):
-    from transactions.logic import _update_tax_summary
 
     tax_year = transaction_instance.executed_at.year
     premium_pln = round(transaction_instance.value_pln, 2)
@@ -45,17 +37,11 @@ def _calculate_tax_option_buy(transaction_instance: Transaction):
         tax=-tax_to_pay_from_transaction,
     )
 
-    _update_tax_summary(
-        tax_year=tax_year,
-        revenue=0,
-        cost=premium_pln,
-        tax=tax_to_pay_from_transaction,
-    )
-
 def calculate_tax_option(transaction_instance: Transaction):
-    from transactions.logic import _update_tax_summary
-    
-    tax_year = transaction_instance.executed_at.year
+    from transactions.logic import init_tax_summary
+
+    init_tax_summary(transaction_instance.executed_at.year)
+
     if not transaction_instance.as_opening_calculation.all() and not transaction_instance.as_closing_calculation.all():
         # NOTE separated buy and sell bc when it was integrated sell was first and when creating tax instance, buy/expire was not there yet
         if transaction_instance.side == "Sell":
@@ -66,7 +52,6 @@ def calculate_tax_option(transaction_instance: Transaction):
         print("⚠️  Option is already included in the tax calculations!")
 
 def _calculate_tax_equity_same_quantity(opening_transaction: Transaction, closing_transaction: Transaction):
-    from transactions.logic import _update_tax_summary
 
     tax_year = closing_transaction.executed_at.year or opening_transaction.year
     profit_or_loss = round(closing_transaction.value_pln - opening_transaction.value_pln, 2)
@@ -79,12 +64,6 @@ def _calculate_tax_equity_same_quantity(opening_transaction: Transaction, closin
         revenue=closing_transaction.value_pln,
         cost=opening_transaction.value_pln,
         profit_or_loss=profit_or_loss,
-        tax=tax_to_pay_from_transaction,
-    )
-    _update_tax_summary(
-        tax_year=tax_year,
-        revenue=closing_transaction.value_pln,
-        cost=opening_transaction.value_pln,
         tax=tax_to_pay_from_transaction,
     )
 
@@ -109,10 +88,10 @@ def _get_partial_quantity_for_transaction(closing_transaction_quantity, summary_
 def _calculate_tax_equity_partial_different_quantity(opening_transaction: Transaction, closing_transaction: Transaction, quantity: int = None):
     # NOTE if quantity is None -> middle transaction -> ratio is 1 (no ratio) and revenue is 0 (only cost)
     # NOTE if quantity exists -> last partial transaction -> ratio is not 0 (used required %)
-    from transactions.logic import _update_tax_summary
 
     ratio = quantity/opening_transaction.quantity if quantity else 1
-    tax_year = closing_transaction.executed_at.year or opening_transaction.year
+    tax_year = closing_transaction.executed_at.year or opening_transaction.executed_at.year
+
     if quantity:
         profit_or_loss = round(closing_transaction.value_pln - opening_transaction.value_pln, 2)
     else:
@@ -131,13 +110,6 @@ def _calculate_tax_equity_partial_different_quantity(opening_transaction: Transa
         profit_or_loss=round(profit_or_loss*ratio, 2),
         tax=tax,
         quantity=quantity
-    )
-    # NOTE shouln't it be done in signal???
-    _update_tax_summary(
-        tax_year=tax_year,
-        revenue=revenue,
-        cost=cost,
-        tax=tax_to_pay_from_transaction,
     )
 
 def _handle_few_transactions_equal_quantity_use_case(matching_transactions, closing_transaction):
@@ -162,7 +134,11 @@ def _handle_few_transactions_equal_quantity_use_case(matching_transactions, clos
                 _calculate_tax_equity_partial_different_quantity(transaction, closing_transaction)
 
 def calculate_tax_equity(transaction_instance: Transaction):
+    from transactions.logic import init_tax_summary
+
     closing_transaction = transaction_instance
+    init_tax_summary(closing_transaction.executed_at.year)
+
     print(f"ℹ️  Searching matching transactions for closing transaction: {closing_transaction}")
 
     matching_transactions = Transaction.objects.filter(asset_name=closing_transaction.asset_name, side="Buy", executed_at__lte=closing_transaction.executed_at).order_by(

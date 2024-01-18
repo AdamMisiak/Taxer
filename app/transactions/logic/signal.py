@@ -8,12 +8,12 @@ from django.dispatch import receiver
 from transactions.models import CurrencyRate, ImportFile, TaxCalculation, TaxSummary, Transaction
 
 def save_data_from_file(import_file_instance: ImportFile):
-    from transactions.logic import save_data_currency_rates_file, save_data_ib_broker_file, _init_tax_summary
+    from transactions.logic import save_data_currency_rates_file, save_data_ib_broker_file, init_tax_summary
 
     with import_file_instance.file.open("r") as file:
         # TaxSummary init
         tax_year = int(str(import_file_instance.file).split("_")[1])
-        _init_tax_summary(tax_year)
+        init_tax_summary(tax_year)
 
         # RATES FILE
         if import_file_instance.file.name.startswith("Rates"):
@@ -36,3 +36,15 @@ def calculate_tax_to_pay(transaction_instance: Transaction):
 
     # DIVIDEND
     # calculate_tax_dividend
+
+def update_tax_summary_for_year(tax_calculation_instance: TaxCalculation):
+    from transactions.logic import update_tax_summary
+
+    # NOTE check this part!
+    tax_year = tax_calculation_instance.closing_transaction.executed_at.year or tax_calculation_instance.opening_transaction.executed_at.year
+    update_tax_summary(
+        tax_year=tax_year,
+        revenue=tax_calculation_instance.revenue,
+        cost=tax_calculation_instance.cost,
+        tax=tax_calculation_instance.tax
+    )
