@@ -1,7 +1,7 @@
 from django.db import models
 
-from .transaction import Transaction
 from .tax_summary import TaxSummary
+from .transaction import Transaction
 
 
 class TaxCalculation(models.Model):

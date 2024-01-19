@@ -11,12 +11,14 @@ def _get_option_type(option_name: str) -> str:
 def _get_strike_price(option_name: str) -> float:
     return float(option_name.split()[-2])
 
+
 def _validate_row_ib_broker_file(row):
     if row[5].startswith("U") and row[5][1:].isnumeric():
         del row[5]
 
     if row[3].startswith("Forex") and row[5].startswith("20") and len(row) == 16:
         row.insert(5, "")
+
 
 def _save_transaction_object(row):
     asset_name_index = 5
@@ -49,9 +51,7 @@ def _save_transaction_object(row):
     price = round(float(row[price_index]), 2)
     value = round(abs(float(row[value_index])), 2)
     value_pln = (
-        round(value * getattr(previous_day_currency_rate, currency.lower()), 2)
-        if currency.lower() != "pln"
-        else value
+        round(value * getattr(previous_day_currency_rate, currency.lower()), 2) if currency.lower() != "pln" else value
     )
     fee = abs(float(row[fee_index]))
     is_option = asset_type == "Equity and Index Options"
@@ -73,6 +73,7 @@ def _save_transaction_object(row):
             "strike_price": _get_strike_price(asset_name) if is_option else None,
         },
     )
+
 
 def save_data_ib_broker_file(file):
     csvreader = csv.reader(file)

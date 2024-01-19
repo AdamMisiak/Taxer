@@ -5,25 +5,30 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('transactions', '0013_currencyrate_chf'),
+        ("transactions", "0013_currencyrate_chf"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='taxcalculation',
-            name='quantity',
+            model_name="taxcalculation",
+            name="quantity",
             field=models.FloatField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='taxcalculation',
-            name='tax_rate',
+            model_name="taxcalculation",
+            name="tax_rate",
             field=models.FloatField(default=0.19),
         ),
         migrations.AddField(
-            model_name='taxcalculation',
-            name='tax_summary',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='tax_calculations', to='transactions.taxsummary'),
+            model_name="taxcalculation",
+            name="tax_summary",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="tax_calculations",
+                to="transactions.taxsummary",
+            ),
         ),
     ]

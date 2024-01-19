@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('transactions', '0012_alter_taxcalculation_closing_transaction_and_more'),
+        ("transactions", "0012_alter_taxcalculation_closing_transaction_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='currencyrate',
-            name='chf',
+            model_name="currencyrate",
+            name="chf",
             field=models.FloatField(default=0),
             preserve_default=False,
         ),

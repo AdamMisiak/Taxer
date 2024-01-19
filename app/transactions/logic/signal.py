@@ -7,8 +7,9 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from transactions.models import CurrencyRate, ImportFile, TaxCalculation, TaxSummary, Transaction
 
+
 def save_data_from_file(import_file_instance: ImportFile):
-    from transactions.logic import save_data_currency_rates_file, save_data_ib_broker_file, init_tax_summary
+    from transactions.logic import init_tax_summary, save_data_currency_rates_file, save_data_ib_broker_file
 
     with import_file_instance.file.open("r") as file:
         # TaxSummary init
@@ -22,6 +23,7 @@ def save_data_from_file(import_file_instance: ImportFile):
         # IB BROKER FILE
         elif import_file_instance.file.name.startswith("IB"):
             save_data_ib_broker_file(file)
+
 
 def calculate_tax_to_pay(transaction_instance: Transaction):
     from transactions.logic import calculate_tax_dividend, calculate_tax_equity, calculate_tax_option
@@ -37,6 +39,7 @@ def calculate_tax_to_pay(transaction_instance: Transaction):
     # DIVIDEND
     # calculate_tax_dividend
 
+
 def update_tax_summary_for_year(tax_calculation_instance: TaxCalculation):
     from transactions.logic import update_tax_summary
 
@@ -44,10 +47,10 @@ def update_tax_summary_for_year(tax_calculation_instance: TaxCalculation):
         tax_year = tax_calculation_instance.closing_transaction.executed_at.year
     elif tax_calculation_instance.opening_transaction:
         tax_year = tax_calculation_instance.opening_transaction.executed_at.year
-        
+
     update_tax_summary(
         tax_year=tax_year,
         revenue=tax_calculation_instance.revenue,
         cost=tax_calculation_instance.cost,
-        tax=tax_calculation_instance.tax
+        tax=tax_calculation_instance.tax,
     )

@@ -5,6 +5,7 @@ from transactions.models import CurrencyRate, ImportFile, TaxCalculation, TaxSum
 class ImportFileAdmin(admin.ModelAdmin):
     list_display = ("id", "file", "created_at")
 
+
 class TaxCalculationOpeningInline(admin.StackedInline):
     verbose_name_plural = "Tax Opening Calculations"
     model = TaxCalculation
@@ -20,7 +21,7 @@ class TaxCalculationClosingInline(admin.StackedInline):
 
 
 class TransactionAdmin(admin.ModelAdmin):
-    date_hierarchy="executed_at"
+    date_hierarchy = "executed_at"
     list_display = (
         "asset_name",
         "colored_side",
@@ -56,7 +57,7 @@ class TaxCalculationAdmin(admin.ModelAdmin):
         "revenue",
         "cost",
         "profit_or_loss",
-        "quantity"
+        "quantity",
     )
     ordering = ("tax", "revenue", "profit_or_loss", "cost")
 
