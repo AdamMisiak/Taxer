@@ -20,7 +20,7 @@ def _validate_row_ib_broker_file(row):
         row.insert(5, "")
 
 
-def _save_transaction_object(row):
+def _save_transaction_object(row: list[str]):
     asset_name_index = 5
     asset_type_index = 3
     price_index = 8
@@ -74,6 +74,8 @@ def _save_transaction_object(row):
         },
     )
 
+def _save_dividend_object(row: list[str]):
+    print(row)
 
 def save_data_ib_broker_file(file):
     csvreader = csv.reader(file)
@@ -88,5 +90,5 @@ def save_data_ib_broker_file(file):
             _save_transaction_object(row)
 
         # DIVIDEND
-        elif row_type == "Dividend":
-            pass
+        elif (row_type == "Dividends" or row_type == "Withholding Tax") and row[1] == "Data":
+            _save_dividend_object(row)

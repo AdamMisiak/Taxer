@@ -1,9 +1,26 @@
 from django.contrib import admin
-from transactions.models import CurrencyRate, ImportFile, TaxCalculation, TaxSummary, Transaction
+from transactions.models import CurrencyRate, ImportFile, TaxCalculation, TaxSummary, Transaction, Dividend
 
 
 class ImportFileAdmin(admin.ModelAdmin):
     list_display = ("id", "file", "created_at")
+
+
+
+class DividendAdmin(admin.ModelAdmin):
+    date_hierarchy = "received_at"
+    list_display = (
+        "asset_name",
+        "value",
+        "value_pln",
+        "currency",
+        "withholding_tax",
+        "received_at",
+    )
+    list_filter = ("asset_name", "currency", "withholding_tax", "received_at")
+    search_fields = ("asset_name",)
+    ordering = ("-received_at", "asset_name", "value", "value_pln")
+
 
 
 class TaxCalculationOpeningInline(admin.StackedInline):
@@ -68,6 +85,7 @@ class CurrencyRateAdmin(admin.ModelAdmin):
 
 
 admin.site.register(ImportFile, ImportFileAdmin)
+admin.site.register(Dividend, DividendAdmin)
 admin.site.register(Transaction, TransactionAdmin)
 admin.site.register(CurrencyRate, CurrencyRateAdmin)
 admin.site.register(TaxSummary, TaxSummaryAdmin)

@@ -46,7 +46,7 @@ class Transaction(models.Model):
     value = models.FloatField()
     value_pln = models.FloatField()
     currency = models.CharField(max_length=3, choices=CURRENCY_CHOCIES)
-    previous_day_currency_rate = models.ForeignKey(CurrencyRate, on_delete=models.RESTRICT, blank=True, null=True)
+    previous_day_currency_rate = models.ForeignKey(CurrencyRate, related_name="transactions", on_delete=models.RESTRICT, blank=True, null=True)
     fee = models.FloatField()
 
     option_type = models.CharField(blank=True, max_length=4, choices=OPTION_TYPE_CHOICES)

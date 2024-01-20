@@ -181,3 +181,5 @@ def calculate_tax_equity(transaction_instance: Transaction):
     #     _calculate_tax_equity(opening_transaction, closing_transaction)
     # else:
     #     raise Exception(f"🛑 Wasn't able to calculate tax for {closing_transaction}")
+
+# NOTE start tackling divs handling
