@@ -27,7 +27,7 @@ class Dividend(models.Model):
     withholding_tax = models.ForeignKey(CurrencyRate, on_delete=models.CASCADE, blank=True, null=True)
 
     # NOTE change to the time zone aware
-    received_at = models.DateTimeField()
+    received_at = models.DateField()
 
     class Meta:
         verbose_name = "Dividend"
@@ -35,7 +35,7 @@ class Dividend(models.Model):
 
     def __str__(self):
         return (
-            f"{self.asset_name} {self.value} {self.currency} - {self.executed_at.date()}"
+            f"{self.asset_name} {self.value} {self.currency} - {self.received_at}"
         )
 
     def save(self, *args, **kwargs):

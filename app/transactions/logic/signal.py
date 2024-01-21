@@ -24,6 +24,9 @@ def save_data_from_file(import_file_instance: ImportFile):
         elif import_file_instance.file.name.startswith("IB"):
             save_data_ib_broker_file(file)
 
+        # NOTE Add DIF broker files for divs + transasctions
+        # NOTE hadnle XTB fie? or handled by broker 
+
 
 def calculate_tax_to_pay(transaction_instance: Transaction):
     from transactions.logic import calculate_tax_dividend, calculate_tax_equity, calculate_tax_option
