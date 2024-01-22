@@ -26,7 +26,6 @@ class Dividend(models.Model):
     previous_day_currency_rate = models.ForeignKey(CurrencyRate, related_name="dividends", on_delete=models.RESTRICT, blank=True, null=True)
     withholding_tax = models.ForeignKey(CurrencyRate, on_delete=models.CASCADE, blank=True, null=True)
 
-    # NOTE change to the time zone aware
     received_at = models.DateField()
 
     class Meta:
