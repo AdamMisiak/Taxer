@@ -76,5 +76,3 @@ class Transaction(models.Model):
         else:
             print(f"✅ Created Transaction object: {self}")
         super(Transaction, self).save(*args, **kwargs)
-
-dzwonek zmienc i fotki NTC 

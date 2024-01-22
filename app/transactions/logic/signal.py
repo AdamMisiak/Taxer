@@ -9,10 +9,11 @@ from transactions.models import CurrencyRate, ImportFile, TaxCalculation, TaxSum
 
 
 def save_data_from_file(import_file_instance: ImportFile):
-    from transactions.logic import init_tax_summary, save_data_currency_rates_file, save_data_ib_broker_file
+    from transactions.logic import init_tax_summary, save_data_currency_rates_file, save_data_dif_broker_file, save_data_ib_broker_file
 
     with import_file_instance.file.open("r") as file:
         # TaxSummary init
+
         tax_year = int(str(import_file_instance.file).split("_")[1])
         init_tax_summary(tax_year)
 
@@ -24,7 +25,10 @@ def save_data_from_file(import_file_instance: ImportFile):
         elif import_file_instance.file.name.startswith("IB"):
             save_data_ib_broker_file(file)
 
-        # NOTE Add DIF broker files for divs + transasctions
+        # DIF BROKER FILE
+        elif import_file_instance.file.name.startswith("DIF"):
+            save_data_dif_broker_file(file)
+
         # NOTE hadnle XTB fie? or handled by broker 
 
 

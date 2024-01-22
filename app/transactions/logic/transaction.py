@@ -80,7 +80,6 @@ def _save_dividend_object(row: list[str]):
     currency_index = 2
     received_at_index = 3
 
-    print(row)
     received_at = datetime.strptime(row[received_at_index], "%Y-%m-%d")
     # NOTE double check if for divs I should also take previous day currency rate!
     previous_day_currency_rate = CurrencyRate.objects.filter(date__lt=received_at).order_by("-date").first()
@@ -121,3 +120,21 @@ def save_data_ib_broker_file(file):
         elif row_type == "Withholding Tax" and row[1] == "Data":
             pass
             # _save_dividend_object(row)
+
+
+def save_data_dif_broker_file(file):
+    csvreader = csv.reader(file, delimiter=";")
+
+    for row in csvreader:
+        row_type = row[0]
+
+        # DIVIDEND
+        if row_type == "Dividends" and row[1] == "Data" and not row[2].startswith("Total"):
+            _save_dividend_object(row)
+
+        # WITHHOLDING TAX
+        elif row_type == "Withholding Tax" and row[1] == "Data":
+            pass
+            # _save_dividend_object(row)
+
+            # NOTE ENB	10.2	43.5	USD	-	June 1, 2022 double check why 3 times saved this record
