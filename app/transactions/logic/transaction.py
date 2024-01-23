@@ -92,7 +92,8 @@ def _save_dividend_object(row: list[str]):
         round(value * getattr(previous_day_currency_rate, currency.lower()), 2) if currency.lower() != "pln" else value
     )
 
-    Dividend.objects.create(
+    # NOTE czy jest mozliwe miec takie same obiekty? przyklad ENB
+    Dividend.objects.get_or_create(
         asset_name=asset_name,
         value=value,
         value_pln=value_pln,
@@ -104,30 +105,46 @@ def _save_dividend_object(row: list[str]):
 # NOTE move it to withoolding tax file
 def _save_withholding_tax_object(row: list[str]):
     print(row)
-    # asset_name_index = 4
-    # value_index = 5
-    # currency_index = 2
-    # received_at_index = 3
+    asset_name_index = 4
+    value_index = 5
+    currency_index = 2
+    paid_at_index = 3
 
-    # received_at = datetime.strptime(row[received_at_index], "%Y-%m-%d")
-    # # NOTE double check if for divs I should also take previous day currency rate!
-    # previous_day_currency_rate = CurrencyRate.objects.filter(date__lt=received_at).order_by("-date").first()
 
-    # asset_name = row[asset_name_index].split("(")[0].strip()
-    # currency = row[currency_index]
-    # value = round(abs(float(row[value_index])), 2)
-    # value_pln = (
-    #     round(value * getattr(previous_day_currency_rate, currency.lower()), 2) if currency.lower() != "pln" else value
-    # )
+    paid_at = datetime.strptime(row[paid_at_index], "%Y-%m-%d")
+    previous_day_currency_rate = CurrencyRate.objects.filter(date__lt=paid_at).order_by("-date").first()
 
-    # WithholdingTax.objects.create(
-    #     asset_name=asset_name,
-    #     value=value,
-    #     value_pln=value_pln,
-    #     currency=currency,
-    #     previous_day_currency_rate=previous_day_currency_rate,
-    #     received_at=received_at,
-    # )
+    asset_name = row[asset_name_index].split("(")[0].strip()
+    currency = row[currency_index]
+    value = round(abs(float(row[value_index])), 2)
+    value_pln = (
+        round(value * getattr(previous_day_currency_rate, currency.lower()), 2) if currency.lower() != "pln" else value
+    )
+
+    print(asset_name)
+    print(currency)
+    print(previous_day_currency_rate)
+    print(paid_at)
+    # NOTE check what happen when more than one record here
+    matching_dividend_object = Dividend.objects.filter(
+        asset_name=asset_name,
+        currency=currency,
+        previous_day_currency_rate=previous_day_currency_rate,
+        received_at=paid_at,
+    ).first()
+    
+
+    withholding_tax_object = WithholdingTax.objects.create(
+        asset_name=asset_name,
+        value=value,
+        value_pln=value_pln,
+        currency=currency,
+        previous_day_currency_rate=previous_day_currency_rate,
+        paid_at=paid_at,
+    )
+
+    matching_dividend_object.withholding_tax = withholding_tax_object
+    matching_dividend_object.save()
 
 
 # NOTE should this file be here? it is related not only to transaciton
@@ -148,7 +165,7 @@ def save_data_ib_broker_file(file):
             _save_dividend_object(row)
 
         # WITHHOLDING TAX
-        elif row_type == "Withholding Tax" and row[1] == "Data":
+        elif row_type == "Withholding Tax" and row[1] == "Data" and not row[2].startswith("Total"):
             _save_withholding_tax_object(row)
 
 
