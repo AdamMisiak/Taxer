@@ -4,3 +4,4 @@ from .tax_calculation import TaxCalculation
 from .tax_summary import TaxSummary
 from .transaction import Transaction
 from .dividend import Dividend
+from .withholding_tax import WithholdingTax

@@ -1,7 +1,7 @@
 import csv
 from datetime import datetime, timedelta
 
-from transactions.models import CurrencyRate, Transaction, Dividend
+from transactions.models import CurrencyRate, Transaction, Dividend, WithholdingTax
 
 
 def _get_option_type(option_name: str) -> str:
@@ -74,6 +74,7 @@ def _save_transaction_object(row: list[str]):
         },
     )
 
+# NOTE move it to dividend file
 def _save_dividend_object(row: list[str]):
     asset_name_index = 4
     value_index = 5
@@ -100,6 +101,36 @@ def _save_dividend_object(row: list[str]):
         received_at=received_at,
     )
 
+# NOTE move it to withoolding tax file
+def _save_withholding_tax_object(row: list[str]):
+    print(row)
+    # asset_name_index = 4
+    # value_index = 5
+    # currency_index = 2
+    # received_at_index = 3
+
+    # received_at = datetime.strptime(row[received_at_index], "%Y-%m-%d")
+    # # NOTE double check if for divs I should also take previous day currency rate!
+    # previous_day_currency_rate = CurrencyRate.objects.filter(date__lt=received_at).order_by("-date").first()
+
+    # asset_name = row[asset_name_index].split("(")[0].strip()
+    # currency = row[currency_index]
+    # value = round(abs(float(row[value_index])), 2)
+    # value_pln = (
+    #     round(value * getattr(previous_day_currency_rate, currency.lower()), 2) if currency.lower() != "pln" else value
+    # )
+
+    # WithholdingTax.objects.create(
+    #     asset_name=asset_name,
+    #     value=value,
+    #     value_pln=value_pln,
+    #     currency=currency,
+    #     previous_day_currency_rate=previous_day_currency_rate,
+    #     received_at=received_at,
+    # )
+
+
+# NOTE should this file be here? it is related not only to transaciton
 def save_data_ib_broker_file(file):
     csvreader = csv.reader(file)
 
@@ -118,8 +149,7 @@ def save_data_ib_broker_file(file):
 
         # WITHHOLDING TAX
         elif row_type == "Withholding Tax" and row[1] == "Data":
-            pass
-            # _save_dividend_object(row)
+            _save_withholding_tax_object(row)
 
 
 def save_data_dif_broker_file(file):

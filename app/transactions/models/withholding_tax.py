@@ -1,7 +1,6 @@
 from django.db import models
 
 from .currency_rate import CurrencyRate
-from .withholding_tax import WithholdingTax
 
 CURRENCY_CHOCIES = [
     ("USD", "USD"),
@@ -12,7 +11,7 @@ CURRENCY_CHOCIES = [
 
 
 
-class Dividend(models.Model):
+class WithholdingTax(models.Model):
     # NOTE user
     # owner = models.ForeignKey(
     #     settings.AUTH_USER_MODEL,
@@ -24,23 +23,22 @@ class Dividend(models.Model):
     value = models.FloatField()
     value_pln = models.FloatField()
     currency = models.CharField(max_length=3, choices=CURRENCY_CHOCIES)
-    previous_day_currency_rate = models.ForeignKey(CurrencyRate, related_name="dividends", on_delete=models.RESTRICT, blank=True, null=True)
-    withholding_tax = models.ForeignKey(WithholdingTax, related_name="dividends", on_delete=models.CASCADE, blank=True, null=True)
+    previous_day_currency_rate = models.ForeignKey(CurrencyRate, related_name="withholding_taxes", on_delete=models.RESTRICT, blank=True, null=True)
 
-    received_at = models.DateField()
+    paid_at = models.DateField()
 
     class Meta:
-        verbose_name = "Dividend"
-        verbose_name_plural = "Dividends"
+        verbose_name = "Withholding Tax"
+        verbose_name_plural = "Withholding Taxes"
 
     def __str__(self):
         return (
-            f"{self.asset_name} {self.value} {self.currency} - {self.received_at}"
+            f"{self.asset_name} {self.value} {self.currency} - {self.paid_at}"
         )
 
     def save(self, *args, **kwargs):
         if self.id is not None:
-            print(f"🆕 Updated Dividend object: {self}")
+            print(f"🆕 Updated WithholdingTax object: {self}")
         else:
-            print(f"✅ Created Dividend object: {self}")
-        super(Dividend, self).save(*args, **kwargs)
+            print(f"✅ Created WithholdingTax object: {self}")
+        super(WithholdingTax, self).save(*args, **kwargs)
