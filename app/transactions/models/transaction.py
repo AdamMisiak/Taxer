@@ -72,7 +72,7 @@ class Transaction(models.Model):
     def save(self, *args, **kwargs):
         # NOTE add different message when updating with different
         if self.id is not None:
-            print(f"🆕 Updated Transaction object: {self}")
+            print(f"🆕 Updated Transaction object: {self}\n")
         else:
-            print(f"✅ Created Transaction object: {self}")
+            print(f"✅ Created Transaction object: {self}\n")
         super(Transaction, self).save(*args, **kwargs)

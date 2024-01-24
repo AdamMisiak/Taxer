@@ -38,7 +38,7 @@ class WithholdingTax(models.Model):
 
     def save(self, *args, **kwargs):
         if self.id is not None:
-            print(f"🆕 Updated WithholdingTax object: {self}")
+            print(f"🆕 Updated WithholdingTax object: {self}\n")
         else:
-            print(f"✅ Created WithholdingTax object: {self}")
+            print(f"✅ Created WithholdingTax object: {self}\n")
         super(WithholdingTax, self).save(*args, **kwargs)

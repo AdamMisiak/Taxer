@@ -11,6 +11,7 @@ class DividendAdmin(admin.ModelAdmin):
     date_hierarchy = "received_at"
     list_display = (
         "asset_name",
+        "value_per_share",
         "value",
         "value_pln",
         "currency",
@@ -19,7 +20,7 @@ class DividendAdmin(admin.ModelAdmin):
     )
     list_filter = ("currency", "received_at")
     search_fields = ("asset_name",)
-    ordering = ("-received_at", "asset_name", "value", "value_pln")
+    ordering = ("-received_at", "asset_name", "value_per_share", "value", "value_pln")
 
 class WithholdingTaxAdmin(admin.ModelAdmin):
     date_hierarchy = "paid_at"

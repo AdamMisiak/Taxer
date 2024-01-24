@@ -21,6 +21,7 @@ class Dividend(models.Model):
     # NOTE broker
     # broker = models.relation(max_length=100, default="API")
     asset_name = models.CharField(max_length=124)
+    value_per_share = models.FloatField(blank=True, null=True)
     value = models.FloatField()
     value_pln = models.FloatField()
     currency = models.CharField(max_length=3, choices=CURRENCY_CHOCIES)
@@ -40,7 +41,7 @@ class Dividend(models.Model):
 
     def save(self, *args, **kwargs):
         if self.id is not None:
-            print(f"🆕 Updated Dividend object: {self}")
+            print(f"🆕 Updated Dividend object: {self}\n")
         else:
-            print(f"✅ Created Dividend object: {self}")
+            print(f"✅ Created Dividend object: {self}\n")
         super(Dividend, self).save(*args, **kwargs)
