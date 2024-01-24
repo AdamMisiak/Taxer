@@ -1,4 +1,5 @@
 import csv
+import re
 from datetime import datetime, timedelta
 
 from transactions.models import CurrencyRate, Transaction, Dividend, WithholdingTax
@@ -74,6 +75,14 @@ def _save_transaction_object(row: list[str]):
         },
     )
 
+def _get_value_per_share(text: str) -> float | None:
+    # NOTE regex catching all the floating numbers from the string
+    match = re.search(re.compile(r'\b\d+(\.\d+)?\b'), text)
+    if match:
+        return float(match.group())
+    return None
+
+
 # NOTE move it to dividend file
 def _save_dividend_object(row: list[str]):
     asset_name_index = 4
@@ -82,19 +91,19 @@ def _save_dividend_object(row: list[str]):
     received_at_index = 3
 
     received_at = datetime.strptime(row[received_at_index], "%Y-%m-%d")
-    # NOTE double check if for divs I should also take previous day currency rate!
     previous_day_currency_rate = CurrencyRate.objects.filter(date__lt=received_at).order_by("-date").first()
 
     asset_name = row[asset_name_index].split("(")[0].strip()
     currency = row[currency_index]
-    value = round(abs(float(row[value_index])), 2)
+    value_per_share = _get_value_per_share(row[asset_name_index])
+    value = round(float(row[value_index]), 2)
     value_pln = (
         round(value * getattr(previous_day_currency_rate, currency.lower()), 2) if currency.lower() != "pln" else value
     )
 
-    # NOTE czy jest mozliwe miec takie same obiekty? przyklad ENB
     Dividend.objects.get_or_create(
         asset_name=asset_name,
+        value_per_share=value_per_share,
         value=value,
         value_pln=value_pln,
         currency=currency,
@@ -104,7 +113,6 @@ def _save_dividend_object(row: list[str]):
 
 # NOTE move it to withoolding tax file
 def _save_withholding_tax_object(row: list[str]):
-    print(row)
     asset_name_index = 4
     value_index = 5
     currency_index = 2
@@ -116,25 +124,25 @@ def _save_withholding_tax_object(row: list[str]):
 
     asset_name = row[asset_name_index].split("(")[0].strip()
     currency = row[currency_index]
-    value = round(abs(float(row[value_index])), 2)
+    value_per_share = _get_value_per_share(row[asset_name_index])
+    value = round(float(row[value_index])*-1, 2)
     value_pln = (
         round(value * getattr(previous_day_currency_rate, currency.lower()), 2) if currency.lower() != "pln" else value
     )
 
-    print(asset_name)
-    print(currency)
-    print(previous_day_currency_rate)
-    print(paid_at)
     # NOTE check what happen when more than one record here
-    matching_dividend_object = Dividend.objects.filter(
+    value_filter = {"value__gt": 0} if value > 0 else {"value__lt": 0}
+    matching_dividend_object = Dividend.objects.get(
         asset_name=asset_name,
+        value_per_share=value_per_share,
         currency=currency,
         previous_day_currency_rate=previous_day_currency_rate,
         received_at=paid_at,
-    ).first()
-    
+        withholding_tax__isnull=True,
+        **value_filter,
+    )
 
-    withholding_tax_object = WithholdingTax.objects.create(
+    withholding_tax_object, created = WithholdingTax.objects.get_or_create(
         asset_name=asset_name,
         value=value,
         value_pln=value_pln,
