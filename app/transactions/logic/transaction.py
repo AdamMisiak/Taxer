@@ -1,9 +1,6 @@
-import csv
-import re
 from datetime import datetime, timedelta
 
-from transactions.models import CurrencyRate, Transaction, Dividend, WithholdingTax
-
+from transactions.models import CurrencyRate, Transaction
 
 def _get_option_type(option_name: str) -> str:
     return "CALL" if option_name[-1] == "C" else "PUT"
@@ -12,16 +9,7 @@ def _get_option_type(option_name: str) -> str:
 def _get_strike_price(option_name: str) -> float:
     return float(option_name.split()[-2])
 
-
-def _validate_row_ib_broker_file(row):
-    if row[5].startswith("U") and row[5][1:].isnumeric():
-        del row[5]
-
-    if row[3].startswith("Forex") and row[5].startswith("20") and len(row) == 16:
-        row.insert(5, "")
-
-
-def _save_transaction_object(row: list[str]):
+def save_transaction_object(row: list[str]):
     asset_name_index = 5
     asset_type_index = 3
     price_index = 8
@@ -74,122 +62,3 @@ def _save_transaction_object(row: list[str]):
             "strike_price": _get_strike_price(asset_name) if is_option else None,
         },
     )
-
-def _get_value_per_share(text: str) -> float | None:
-    # NOTE regex catching all the floating numbers from the string
-    match = re.search(re.compile(r'\b\d+(\.\d+)?\b'), text)
-    if match:
-        return float(match.group())
-    return None
-
-
-# NOTE move it to dividend file
-def _save_dividend_object(row: list[str]):
-    asset_name_index = 4
-    value_index = 5
-    currency_index = 2
-    received_at_index = 3
-
-    received_at = datetime.strptime(row[received_at_index], "%Y-%m-%d")
-    previous_day_currency_rate = CurrencyRate.objects.filter(date__lt=received_at).order_by("-date").first()
-
-    asset_name = row[asset_name_index].split("(")[0].strip()
-    currency = row[currency_index]
-    value_per_share = _get_value_per_share(row[asset_name_index])
-    value = round(float(row[value_index]), 2)
-    value_pln = (
-        round(value * getattr(previous_day_currency_rate, currency.lower()), 2) if currency.lower() != "pln" else value
-    )
-
-    Dividend.objects.get_or_create(
-        asset_name=asset_name,
-        value_per_share=value_per_share,
-        value=value,
-        value_pln=value_pln,
-        currency=currency,
-        previous_day_currency_rate=previous_day_currency_rate,
-        received_at=received_at,
-    )
-
-# NOTE move it to withoolding tax file
-def _save_withholding_tax_object(row: list[str]):
-    asset_name_index = 4
-    value_index = 5
-    currency_index = 2
-    paid_at_index = 3
-
-
-    paid_at = datetime.strptime(row[paid_at_index], "%Y-%m-%d")
-    previous_day_currency_rate = CurrencyRate.objects.filter(date__lt=paid_at).order_by("-date").first()
-
-    asset_name = row[asset_name_index].split("(")[0].strip()
-    currency = row[currency_index]
-    value_per_share = _get_value_per_share(row[asset_name_index])
-    value = round(float(row[value_index])*-1, 2)
-    value_pln = (
-        round(value * getattr(previous_day_currency_rate, currency.lower()), 2) if currency.lower() != "pln" else value
-    )
-
-    # NOTE check what happen when more than one record here
-    value_filter = {"value__gt": 0} if value > 0 else {"value__lt": 0}
-    matching_dividend_object = Dividend.objects.get(
-        asset_name=asset_name,
-        value_per_share=value_per_share,
-        currency=currency,
-        previous_day_currency_rate=previous_day_currency_rate,
-        received_at=paid_at,
-        withholding_tax__isnull=True,
-        **value_filter,
-    )
-
-    withholding_tax_object, created = WithholdingTax.objects.get_or_create(
-        asset_name=asset_name,
-        value=value,
-        value_pln=value_pln,
-        currency=currency,
-        previous_day_currency_rate=previous_day_currency_rate,
-        paid_at=paid_at,
-    )
-
-    matching_dividend_object.withholding_tax = withholding_tax_object
-    matching_dividend_object.save()
-
-
-# NOTE should this file be here? it is related not only to transaciton
-def save_data_ib_broker_file(file):
-    csvreader = csv.reader(file)
-
-    for row in csvreader:
-        row_type = row[0]
-        # NOTE transactions has to be chronogically!!!
-
-        # TRANSACTION
-        if row_type == "Trades" and row[1] == "Data":
-            _validate_row_ib_broker_file(row)
-            _save_transaction_object(row)
-
-        # DIVIDEND
-        elif row_type == "Dividends" and row[1] == "Data" and not row[2].startswith("Total"):
-            _save_dividend_object(row)
-
-        # WITHHOLDING TAX
-        elif row_type == "Withholding Tax" and row[1] == "Data" and not row[2].startswith("Total"):
-            _save_withholding_tax_object(row)
-
-
-def save_data_dif_broker_file(file):
-    csvreader = csv.reader(file, delimiter=";")
-
-    for row in csvreader:
-        row_type = row[0]
-
-        # DIVIDEND
-        if row_type == "Dividends" and row[1] == "Data" and not row[2].startswith("Total"):
-            _save_dividend_object(row)
-
-        # WITHHOLDING TAX
-        elif row_type == "Withholding Tax" and row[1] == "Data":
-            pass
-            # _save_dividend_object(row)
-
-            # NOTE ENB	10.2	43.5	USD	-	June 1, 2022 double check why 3 times saved this record

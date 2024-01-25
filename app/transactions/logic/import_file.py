@@ -1,0 +1,52 @@
+
+import csv
+
+
+def _validate_row_ib_broker_file(row):
+    if row[5].startswith("U") and row[5][1:].isnumeric():
+        del row[5]
+
+    if row[3].startswith("Forex") and row[5].startswith("20") and len(row) == 16:
+        row.insert(5, "")
+
+
+
+def save_data_ib_broker_file(file):
+    from transactions.logic import save_dividend_object, save_withholding_tax_object, save_transaction_object
+
+    csvreader = csv.reader(file)
+
+    for row in csvreader:
+        row_type = row[0]
+        # NOTE transactions has to be chronogically!!!
+
+        # TRANSACTION
+        if row_type == "Trades" and row[1] == "Data":
+            _validate_row_ib_broker_file(row)
+            save_transaction_object(row)
+
+        # DIVIDEND
+        elif row_type == "Dividends" and row[1] == "Data" and not row[2].startswith("Total"):
+            save_dividend_object(row)
+
+        # WITHHOLDING TAX
+        elif row_type == "Withholding Tax" and row[1] == "Data" and not row[2].startswith("Total"):
+            save_withholding_tax_object(row)
+
+
+def save_data_dif_broker_file(file):
+    from transactions.logic import save_dividend_object
+
+    csvreader = csv.reader(file, delimiter=";")
+
+    for row in csvreader:
+        row_type = row[0]
+
+        # DIVIDEND
+        if row_type == "Dividends" and row[1] == "Data" and not row[2].startswith("Total"):
+            save_dividend_object(row)
+
+        # WITHHOLDING TAX
+        elif row_type == "Withholding Tax" and row[1] == "Data":
+            pass
+            # _save_dividend_object(row)
