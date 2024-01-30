@@ -7,14 +7,21 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from transactions.models import CurrencyRate, ImportFile, TaxCalculation, TaxSummary, Transaction
 
+def _get_tax_year_from_file(file_name: str) -> float:
+    regex_pattern = re.compile(r'(?<!\d)\d{4}(?!\d)')
+    match = re.search(regex_pattern, file_name)
+    if match:
+        return float(match.group())
+    else:
+        raise Exception(f"🛑 Failed to find tax year in '{file_name}'.")
 
 def save_data_from_file(import_file_instance: ImportFile):
     from transactions.logic import init_tax_summary, save_data_currency_rates_file, save_data_dif_broker_file, save_data_ib_broker_file
 
     with import_file_instance.file.open("r") as file:
+        tax_year = _get_tax_year_from_file(str(import_file_instance.file))
+        
         # TaxSummary init
-
-        tax_year = int(str(import_file_instance.file).split("_")[1])
         init_tax_summary(tax_year)
 
         # RATES FILE

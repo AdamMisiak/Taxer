@@ -8,6 +8,11 @@ def _validate_row_ib_broker_file(row):
     if row[3].startswith("Forex") and row[5].startswith("20") and len(row) == 16:
         row.insert(5, "")
 
+    if row[3].startswith("U") and row[3][1:].isnumeric():
+        del row[3]
+
+    if row[2].startswith("U") and row[2][1:].isnumeric():
+        del row[2]
 
 def save_data_ib_broker_file(file):
     from transactions.logic import save_dividend_object, save_withholding_tax_object_ib_broker, save_transaction_object
@@ -25,10 +30,12 @@ def save_data_ib_broker_file(file):
 
         # DIVIDEND
         elif row_type == "Dividends" and row[1] == "Data" and not row[2].startswith("Total"):
+            _validate_row_ib_broker_file(row)
             save_dividend_object(row)
 
         # WITHHOLDING TAX
         elif row_type == "Withholding Tax" and row[1] == "Data" and not row[2].startswith("Total"):
+            _validate_row_ib_broker_file(row)
             save_withholding_tax_object_ib_broker(row)
 
 
