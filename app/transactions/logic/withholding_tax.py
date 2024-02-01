@@ -22,17 +22,9 @@ def save_withholding_tax_object_ib_broker(row: list[str]):
     )
 
     value_filter = {"value__gt": 0} if value > 0 else {"value__lt": 0}
-    matching_dividend_object = Dividend.objects.get(
-        asset_name=asset_name,
-        value_per_share=value_per_share,
-        currency=currency,
-        previous_day_currency_rate=previous_day_currency_rate,
-        received_at=paid_at,
-        withholding_tax__isnull=True,
-        **value_filter,
-    )
 
-    withholding_tax_object, _ = WithholdingTax.objects.get_or_create(
+    # TODO test that it is working fine with switch of the order
+    withholding_tax_object, created = WithholdingTax.objects.get_or_create(
         asset_name=asset_name,
         value=value,
         value_pln=value_pln,
@@ -40,9 +32,19 @@ def save_withholding_tax_object_ib_broker(row: list[str]):
         previous_day_currency_rate=previous_day_currency_rate,
         paid_at=paid_at,
     )
+    if created:
+        matching_dividend_object = Dividend.objects.get(
+            asset_name=asset_name,
+            value_per_share=value_per_share,
+            currency=currency,
+            previous_day_currency_rate=previous_day_currency_rate,
+            received_at=paid_at,
+            withholding_tax__isnull=True,
+            **value_filter,
+        )
 
-    matching_dividend_object.withholding_tax = withholding_tax_object
-    matching_dividend_object.save()
+        matching_dividend_object.withholding_tax = withholding_tax_object
+        matching_dividend_object.save()
 
 
 def save_withholding_tax_object_dif_broker(row: list[str]):

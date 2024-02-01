@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from django.conf import settings
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from transactions.models import CurrencyRate, ImportFile, TaxCalculation, TaxSummary, Transaction
+from transactions.models import CurrencyRate, ImportFile, TaxCalculation, TaxSummary, Transaction, Dividend
 
 def _get_tax_year_from_file(file_name: str) -> float:
     regex_pattern = re.compile(r'(?<!\d)\d{4}(?!\d)')
@@ -39,19 +39,21 @@ def save_data_from_file(import_file_instance: ImportFile):
         # NOTE hadnle XTB fie? or handled by broker 
 
 
-def calculate_tax_to_pay(transaction_instance: Transaction):
+def calculate_tax_to_pay(model_instance: Transaction | Dividend):
     from transactions.logic import calculate_tax_dividend, calculate_tax_equity, calculate_tax_option
 
     # OPTION
-    if transaction_instance.asset_type == "Equity and Index Options":
-        calculate_tax_option(transaction_instance)
+    if isinstance(model_instance, Transaction) and model_instance.asset_type == "Equity and Index Options":
+        calculate_tax_option(model_instance)
 
     # STOCK
-    elif transaction_instance.asset_type in ["Stocks", "ETFs"] and transaction_instance.side == "Sell":
-        calculate_tax_equity(transaction_instance)
+    elif isinstance(model_instance, Transaction) and model_instance.asset_type in ["Stocks", "ETFs"] and model_instance.side == "Sell":
+        calculate_tax_equity(model_instance)
 
     # DIVIDEND
-    # calculate_tax_dividend
+    # TODO check if how much tax was paid
+    elif isinstance(model_instance, Dividend):
+        calculate_tax_dividend(model_instance)
 
 
 def update_tax_summary_for_year(tax_calculation_instance: TaxCalculation):
