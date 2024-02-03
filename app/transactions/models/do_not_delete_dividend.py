@@ -12,6 +12,15 @@ CURRENCY_CHOCIES = [
 
 
 
+
+
+
+# NOTE think of better way for the models - after finishing MVP
+# NOTE some parent model and few children?
+
+
+
+
 class Dividend(models.Model):
     # NOTE user
     # owner = models.ForeignKey(
@@ -26,7 +35,7 @@ class Dividend(models.Model):
     value_pln = models.FloatField()
     currency = models.CharField(max_length=3, choices=CURRENCY_CHOCIES)
     previous_day_currency_rate = models.ForeignKey(CurrencyRate, related_name="dividends", on_delete=models.RESTRICT, blank=True, null=True)
-    withholding_tax = models.ForeignKey(WithholdingTax, related_name="dividends", on_delete=models.CASCADE, blank=True, null=True)
+    # withholding_tax = models.ForeignKey(WithholdingTax, related_name="dividends", on_delete=models.CASCADE, blank=True, null=True)
 
     received_at = models.DateField()
 

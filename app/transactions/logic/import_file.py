@@ -15,23 +15,25 @@ def _validate_row_ib_broker_file(row):
         del row[2]
 
 def save_data_ib_broker_file(file):
-    from transactions.logic import save_dividend_object, save_withholding_tax_object_ib_broker, save_transaction_object
+    from transactions.logic import save_dividend_object, save_withholding_tax_object_ib_broker, save_trade_transaction_object, save_dividend_transaction_object
 
     csvreader = csv.reader(file)
 
     for row in csvreader:
         row_type = row[0]
         # NOTE transactions has to be chronogically!!!
+        print(row)
 
         # TRANSACTION
         if row_type == "Trades" and row[1] == "Data":
             _validate_row_ib_broker_file(row)
-            save_transaction_object(row)
+            save_trade_transaction_object(row)
 
         # DIVIDEND
-        elif row_type == "Dividends" and row[1] == "Data" and not row[2].startswith("Total"):
+        if row_type == "Dividends" and row[1] == "Data" and not row[2].startswith("Total"):
             _validate_row_ib_broker_file(row)
-            save_dividend_object(row)
+            save_dividend_transaction_object(row)
+            # save_dividend_object(row)
 
         # WITHHOLDING TAX
         elif row_type == "Withholding Tax" and row[1] == "Data" and not row[2].startswith("Total"):

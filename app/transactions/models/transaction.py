@@ -2,18 +2,22 @@ from django.db import models
 from django.utils.html import format_html
 
 from .currency_rate import CurrencyRate
+from .withholding_tax import WithholdingTax
 
 SIDE_CHOICES = [
     ("Buy", "Buy"),
     ("Sell", "Sell"),
 ]
 
+# NOTE add div here!!!
 ASSET_TYPE_CHOICES = [
     ("Stocks", "Stocks"),
     ("Bonds", "Bonds"),
     ("Equity and Index Options", "Options"),
     ("ETFs", "ETFs"),
     ("Forex", "Forex"),
+    ("Dividends", "Dividends"),
+    ("Withholding Tax", "Withholding Tax"),
 ]
 
 CURRENCY_CHOCIES = [
@@ -39,18 +43,23 @@ class Transaction(models.Model):
     # broker = models.relation(max_length=100, default="API")
     asset_name = models.CharField(max_length=124)
     asset_type = models.CharField(max_length=124, choices=ASSET_TYPE_CHOICES)
-    side = models.CharField(max_length=8, choices=SIDE_CHOICES)
+    side = models.CharField(max_length=8, choices=SIDE_CHOICES, blank=True)
 
-    price = models.FloatField()
-    quantity = models.FloatField()
+    price = models.FloatField(null=True, blank=True)
+    quantity = models.FloatField(null=True, blank=True)
     value = models.FloatField()
     value_pln = models.FloatField()
     currency = models.CharField(max_length=3, choices=CURRENCY_CHOCIES)
     previous_day_currency_rate = models.ForeignKey(CurrencyRate, related_name="transactions", on_delete=models.RESTRICT, blank=True, null=True)
-    fee = models.FloatField()
+    fee = models.FloatField(null=True, blank=True)
 
+    # Option only
     option_type = models.CharField(blank=True, max_length=4, choices=OPTION_TYPE_CHOICES)
     strike_price = models.FloatField(null=True, blank=True)
+
+    # Dividend only
+    value_per_share = models.FloatField(blank=True, null=True)
+    withholding_tax = models.ForeignKey("Transaction", related_name="dividends", on_delete=models.CASCADE, blank=True, null=True)
 
     # NOTE change to the time zone aware
     executed_at = models.DateTimeField()
@@ -65,6 +74,18 @@ class Transaction(models.Model):
         return format_html(f'<span style="color: #{color_code};">{self.side}</span>')
 
     def __str__(self):
+        if self.asset_type in ["Dividends", "Withholding Tax"]:
+            return (
+                f"{self.asset_name} {self.value} {self.currency} - {self.executed_at}"
+            )
+        elif self.asset_type in ["Stocks", "ETFs", "Forex"]:
+            return (
+                f"{self.side} {self.quantity} {self.asset_name} @ {self.price} {self.currency} - {self.executed_at.date()}"
+            )
+        elif self.asset_type == "Equity and Index Options":
+            return (
+                f"{self.side} {self.option_type} {self.quantity} {self.asset_name} @ {self.price} {self.currency}"
+            )
         return (
             f"{self.side} {self.quantity} {self.asset_name} @ {self.price} {self.currency} - {self.executed_at.date()}"
         )

@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from django.conf import settings
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from transactions.models import CurrencyRate, ImportFile, TaxCalculation, TaxSummary, Transaction, Dividend
+from transactions.models import CurrencyRate, ImportFile, TaxCalculation, TaxSummary, Transaction
 
 def _get_tax_year_from_file(file_name: str) -> float:
     regex_pattern = re.compile(r'(?<!\d)\d{4}(?!\d)')
@@ -39,7 +39,7 @@ def save_data_from_file(import_file_instance: ImportFile):
         # NOTE hadnle XTB fie? or handled by broker 
 
 
-def calculate_tax_to_pay(model_instance: Transaction | Dividend):
+def calculate_tax_to_pay(model_instance: Transaction):
     from transactions.logic import calculate_tax_dividend, calculate_tax_equity, calculate_tax_option
 
     # OPTION
@@ -52,8 +52,8 @@ def calculate_tax_to_pay(model_instance: Transaction | Dividend):
 
     # DIVIDEND
     # TODO check if how much tax was paid
-    elif isinstance(model_instance, Dividend):
-        calculate_tax_dividend(model_instance)
+    # elif isinstance(model_instance, Dividend):
+    #     calculate_tax_dividend(model_instance)
 
 
 def update_tax_summary_for_year(tax_calculation_instance: TaxCalculation):

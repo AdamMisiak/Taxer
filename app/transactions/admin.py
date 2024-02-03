@@ -1,5 +1,5 @@
 from django.contrib import admin
-from transactions.models import CurrencyRate, WithholdingTax, ImportFile, TaxCalculation, TaxSummary, Transaction, Dividend
+from transactions.models import CurrencyRate, WithholdingTax, ImportFile, TaxCalculation, TaxSummary, Transaction
 
 
 class ImportFileAdmin(admin.ModelAdmin):
@@ -15,7 +15,7 @@ class DividendAdmin(admin.ModelAdmin):
         "value",
         "value_pln",
         "currency",
-        "withholding_tax",
+        # "withholding_tax",
         "received_at",
     )
     list_filter = ("currency", "received_at")
@@ -61,7 +61,7 @@ class TransactionAdmin(admin.ModelAdmin):
         "value",
         "value_pln",
         "currency",
-        "fee",
+        # "fee",
         "executed_at",
     )
     list_filter = ("side", "asset_type", "currency", "executed_at")
@@ -98,7 +98,7 @@ class CurrencyRateAdmin(admin.ModelAdmin):
 
 
 admin.site.register(ImportFile, ImportFileAdmin)
-admin.site.register(Dividend, DividendAdmin)
+# admin.site.register(Dividend, DividendAdmin)
 admin.site.register(WithholdingTax, WithholdingTaxAdmin)
 admin.site.register(Transaction, TransactionAdmin)
 admin.site.register(CurrencyRate, CurrencyRateAdmin)

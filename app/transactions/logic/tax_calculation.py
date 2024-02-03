@@ -1,5 +1,5 @@
 from django.conf import settings
-from transactions.models import CurrencyRate, TaxCalculation, TaxSummary, Transaction, Dividend
+from transactions.models import CurrencyRate, TaxCalculation, TaxSummary, Transaction
 
 
 def _calculate_tax_option_sell(transaction_instance: Transaction):
@@ -180,22 +180,22 @@ def calculate_tax_equity(transaction_instance: Transaction):
 
 # NOTE tax summary dodac podzial na tax z danej kategorii, div, options etc
 
-def calculate_tax_dividend(dividend_instance: Dividend):
-    from transactions.logic import init_tax_summary
+# def calculate_tax_dividend(dividend_instance: Dividend):
+#     from transactions.logic import init_tax_summary
 
-    tax_year = dividend_instance.received_at.year
-    dividend_pln = round(dividend_instance.value_pln, 2)
-    tax_to_pay_from_dividend = round(dividend_pln * settings.TAX_RATE, 2)
+#     tax_year = dividend_instance.received_at.year
+#     dividend_pln = round(dividend_instance.value_pln, 2)
+#     tax_to_pay_from_dividend = round(dividend_pln * settings.TAX_RATE, 2)
 
-    init_tax_summary(tax_year)
-    TaxCalculation.objects.create(
-        tax_summary=TaxSummary.objects.get(year=tax_year),
-        opening_transaction=dividend_instance,
-        revenue=dividend_pln,
-        cost=0,
-        profit_or_loss=dividend_pln,
-        tax=tax_to_pay_from_dividend,
-    )
+#     init_tax_summary(tax_year)
+#     TaxCalculation.objects.create(
+#         tax_summary=TaxSummary.objects.get(year=tax_year),
+#         opening_transaction=dividend_instance,
+#         revenue=dividend_pln,
+#         cost=0,
+#         profit_or_loss=dividend_pln,
+#         tax=tax_to_pay_from_dividend,
+#     )
 
 # TODO opening_transaction has to be transaction model
 # TODO create transaction main model -> option transaction, Stocks transaction, dividend etc as children

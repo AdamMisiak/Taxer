@@ -1,8 +1,8 @@
 from .currency_rate import save_data_currency_rates_file
 from .signal import calculate_tax_to_pay, save_data_from_file, update_tax_summary_for_year
-from .tax_calculation import calculate_tax_dividend, calculate_tax_equity, calculate_tax_option
+from .tax_calculation import calculate_tax_equity, calculate_tax_option
 from .tax_summary import init_tax_summary, update_tax_summary
 from .import_file import save_data_ib_broker_file, save_data_dif_broker_file
-from .withholding_tax import save_withholding_tax_object_ib_broker, save_withholding_tax_object_dif_broker
-from .transaction import save_transaction_object
-from .dividend import save_dividend_object, _get_value_per_share
+from .withholding_tax import save_withholding_tax_object_dif_broker
+from .transaction import save_trade_transaction_object, save_dividend_transaction_object, save_withholding_tax_object_ib_broker
+# from .dividend import save_dividend_object, _get_value_per_share
