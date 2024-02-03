@@ -40,7 +40,7 @@ def save_data_from_file(import_file_instance: ImportFile):
 
 
 def calculate_tax_to_pay(model_instance: Transaction):
-    from transactions.logic import calculate_tax_dividend, calculate_tax_equity, calculate_tax_option
+    from transactions.logic import calculate_tax_equity, calculate_tax_option, calculate_tax_dividend
 
     # OPTION
     if isinstance(model_instance, Transaction) and model_instance.asset_type == "Equity and Index Options":
@@ -52,8 +52,10 @@ def calculate_tax_to_pay(model_instance: Transaction):
 
     # DIVIDEND
     # TODO check if how much tax was paid
-    # elif isinstance(model_instance, Dividend):
-    #     calculate_tax_dividend(model_instance)
+    elif isinstance(model_instance, Transaction) and model_instance.asset_type == "Dividends":
+        print(model_instance)
+        print(model_instance.asset_type)
+        calculate_tax_dividend(model_instance)
 
 
 def update_tax_summary_for_year(tax_calculation_instance: TaxCalculation):

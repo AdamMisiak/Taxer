@@ -89,7 +89,7 @@ class TaxCalculationAdmin(admin.ModelAdmin):
         "profit_or_loss",
         "quantity",
     )
-    ordering = ("tax", "revenue", "profit_or_loss", "cost")
+    ordering = ("-closing_transaction__executed_at", "tax", "revenue", "profit_or_loss", "cost")
 
 
 class CurrencyRateAdmin(admin.ModelAdmin):

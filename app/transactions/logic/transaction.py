@@ -106,9 +106,7 @@ def save_dividend_transaction_object(row: list[str]):
         executed_at=executed_at,
     )
 
-def save_withholding_tax_object_ib_broker(row: list[str]):
-    from transactions.logic import _get_value_per_share
-
+def save_withholding_tax_transaction_object_ib_broker(row: list[str]):
     asset_type_index = 0
     asset_name_index = 4
     value_index = 5
