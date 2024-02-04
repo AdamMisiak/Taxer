@@ -25,6 +25,7 @@ def save_data_ib_broker_file(file):
 
         # TRANSACTION
         if row_type == "Trades" and row[1] == "Data":
+            print(row)
             _validate_row_ib_broker_file(row)
             save_trade_transaction_object(row)
 

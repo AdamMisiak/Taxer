@@ -45,7 +45,6 @@ def save_trade_transaction_object(row: list[str]):
     )
     fee = abs(float(row[fee_index]))
     is_option = asset_type == "Equity and Index Options"
-    print(asset_type)
 
     Transaction.objects.get_or_create(
         asset_name=asset_name,

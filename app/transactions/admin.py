@@ -79,6 +79,7 @@ class TaxSummaryAdmin(admin.ModelAdmin):
 
 
 class TaxCalculationAdmin(admin.ModelAdmin):
+    date_hierarchy = "closing_transaction__executed_at"
     list_display = (
         "id",
         "opening_transaction",
@@ -89,6 +90,7 @@ class TaxCalculationAdmin(admin.ModelAdmin):
         "profit_or_loss",
         "quantity",
     )
+    list_filter = ("opening_transaction__asset_type", "closing_transaction__asset_type")
     ordering = ("-closing_transaction__executed_at", "tax", "revenue", "profit_or_loss", "cost")
 
 

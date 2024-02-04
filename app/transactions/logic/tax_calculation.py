@@ -184,8 +184,8 @@ def calculate_tax_dividend(transaction_instance: Transaction):
     from transactions.logic import init_tax_summary
 
     withholding_tax_instance = transaction_instance.withholding_tax
-    print(transaction_instance)
-    print(withholding_tax_instance)
+    # print(transaction_instance)
+    # print(withholding_tax_instance)
     if withholding_tax_instance:
         tax_year = transaction_instance.executed_at.year
 
@@ -210,3 +210,4 @@ def calculate_tax_dividend(transaction_instance: Transaction):
 # TODO create transaction main model -> option transaction, Stocks transaction, dividend etc as children
 # TODO change signals to celery task?
 # TODO tax calculation should be also separated to each category
+# TODO separated apps for trasnactions,taxes etc?
