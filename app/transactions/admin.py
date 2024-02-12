@@ -37,14 +37,14 @@ class WithholdingTaxAdmin(admin.ModelAdmin):
 
 
 class TaxCalculationOpeningInline(admin.StackedInline):
-    verbose_name_plural = "Tax Opening Calculations"
+    verbose_name_plural = "As Closing Tax Calculations"
     model = TaxCalculation
     fk_name = "closing_transaction"
     extra = 0
 
 
 class TaxCalculationClosingInline(admin.StackedInline):
-    verbose_name_plural = "Tax Closing Calculations"
+    verbose_name_plural = "As Opening Tax Calculations"
     model = TaxCalculation
     fk_name = "opening_transaction"
     extra = 0
@@ -91,6 +91,7 @@ class TaxCalculationAdmin(admin.ModelAdmin):
         "quantity",
     )
     list_filter = ("opening_transaction__asset_type", "closing_transaction__asset_type")
+    search_fields = ("closing_transaction__asset_name", "opening_transaction__asset_name")
     ordering = ("-closing_transaction__executed_at", "tax", "revenue", "profit_or_loss", "cost")
 
 

@@ -10,7 +10,6 @@ def _get_strike_price(option_name: str) -> float:
     return float(option_name.split()[-2])
 
 def save_trade_transaction_object(row: list[str]):
-    print(row)
     asset_name_index = 5
     asset_type_index = 3
     price_index = 8

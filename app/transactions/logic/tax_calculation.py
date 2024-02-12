@@ -36,6 +36,8 @@ def calculate_tax_option(transaction_instance: Transaction):
     from transactions.logic import init_tax_summary
 
     init_tax_summary(transaction_instance.executed_at.year)
+    print('OPTION calculate_tax_option')
+    print(transaction_instance)
 
     if not transaction_instance.as_opening_calculation.all() and not transaction_instance.as_closing_calculation.all():
         # NOTE separated buy and sell bc when it was integrated sell was first and when creating tax instance, buy/expire was not there yet
@@ -92,22 +94,52 @@ def _calculate_tax_equity_partial_different_quantity(
     ratio = quantity / opening_transaction.quantity if quantity else 1
     tax_year = closing_transaction.executed_at.year or opening_transaction.executed_at.year
 
-    if quantity:
-        profit_or_loss = round(closing_transaction.value_pln - opening_transaction.value_pln, 2)
-    else:
-        profit_or_loss = round(-opening_transaction.value_pln, 2)
-    tax_to_pay_from_transaction = round(profit_or_loss * settings.TAX_RATE, 2)
-
     revenue = closing_transaction.value_pln if quantity else 0
     cost = round(opening_transaction.value_pln * ratio, 2)
-    tax = round(tax_to_pay_from_transaction * ratio, 2)
+
+    if quantity:
+        profit_or_loss = round(revenue - cost, 2)
+    else:
+        profit_or_loss = round(-opening_transaction.value_pln, 2)
+    tax = round(profit_or_loss * settings.TAX_RATE, 2)
+
     TaxCalculation.objects.create(
         tax_summary=TaxSummary.objects.get(year=tax_year),
         opening_transaction=opening_transaction,
         closing_transaction=closing_transaction,
         revenue=revenue,
         cost=cost,
-        profit_or_loss=round(profit_or_loss * ratio, 2),
+        profit_or_loss=profit_or_loss,
+        tax=tax,
+        quantity=quantity,
+    )
+
+# NOTE przekminic to
+def _calculate_tax_equity_partial_different_quantity_temp2(
+    opening_transaction: Transaction, closing_transaction: Transaction, quantity: int = None
+):
+    # NOTE needs to chekc if it is last transaction -> if closing trans quantity == summary open trans quantity
+    # NOTE if it is not last -> do not include revenue
+
+    ratio = quantity / opening_transaction.quantity if quantity else 1
+    tax_year = closing_transaction.executed_at.year or opening_transaction.executed_at.year
+
+    revenue = 0
+    cost = round(opening_transaction.value_pln * ratio, 2)
+
+    if quantity:
+        profit_or_loss = round(revenue - cost, 2)
+    else:
+        profit_or_loss = round(-opening_transaction.value_pln, 2)
+    tax = round(profit_or_loss * settings.TAX_RATE, 2)
+
+    TaxCalculation.objects.create(
+        tax_summary=TaxSummary.objects.get(year=tax_year),
+        opening_transaction=opening_transaction,
+        closing_transaction=closing_transaction,
+        revenue=revenue,
+        cost=cost,
+        profit_or_loss=profit_or_loss,
         tax=tax,
         quantity=quantity,
     )
@@ -116,8 +148,13 @@ def _calculate_tax_equity_partial_different_quantity(
 def _handle_few_transactions_equal_quantity_use_case(matching_transactions, closing_transaction):
     summary_opening_transaction_quantity = 0
 
+    print(matching_transactions)
     for transaction in matching_transactions:
         # NOTE this can be calculated only for first found transaction with same quantity (FIFO rule)
+        print(transaction.quantity)
+        print(closing_transaction.quantity)
+        print(transaction.as_opening_calculation.all())
+        print(summary_opening_transaction_quantity)
         if (
             summary_opening_transaction_quantity == 0
             and transaction.quantity == closing_transaction.quantity
@@ -128,7 +165,7 @@ def _handle_few_transactions_equal_quantity_use_case(matching_transactions, clos
             _calculate_tax_equity_same_quantity(transaction, closing_transaction)
             break
 
-        elif transaction.quantity < closing_transaction.quantity and not transaction.as_opening_calculation.all():
+        elif transaction.quantity <= closing_transaction.quantity and not transaction.as_opening_calculation.all():
             if summary_opening_transaction_quantity + transaction.quantity > closing_transaction.quantity:
                 quantity = _get_partial_quantity_for_transaction(
                     closing_transaction.quantity, summary_opening_transaction_quantity
@@ -140,7 +177,21 @@ def _handle_few_transactions_equal_quantity_use_case(matching_transactions, clos
                 summary_opening_transaction_quantity += transaction.quantity
                 print(f"ℹ️  Used middle transaction: {transaction}")
                 _calculate_tax_equity_partial_different_quantity(transaction, closing_transaction)
-
+        # NOTE use case when transaction has quantity from previosu calculation
+        elif transaction.quantity <= closing_transaction.quantity and transaction.as_opening_calculation.all() and transaction.as_opening_calculation.last().quantity:
+            print("3rd use case")
+            print(transaction)
+            print(closing_transaction)
+            print(transaction.quantity)
+            print(transaction.as_opening_calculation.last())
+            print(transaction.as_opening_calculation.last().quantity)
+    
+            
+            remaining_quantity = transaction.quantity - transaction.as_opening_calculation.last().quantity
+            summary_opening_transaction_quantity += remaining_quantity
+            print(f"ℹ️  Used partial transaction with {remaining_quantity} remaining quantity: {transaction}")
+            _calculate_tax_equity_partial_different_quantity_temp2(transaction, closing_transaction, remaining_quantity)
+        print("---------")
 
 def calculate_tax_equity(transaction_instance: Transaction):
     from transactions.logic import init_tax_summary
