@@ -130,3 +130,5 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 TAX_RATE = 0.19
+
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 1500

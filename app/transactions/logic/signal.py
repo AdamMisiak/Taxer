@@ -29,7 +29,7 @@ def save_data_from_file(import_file_instance: ImportFile):
             save_data_currency_rates_file(file)
 
         # IB BROKER FILE
-        elif import_file_instance.file.name.startswith("IB"):
+        elif import_file_instance.file.name.startswith("IB") or import_file_instance.file.name.startswith("LYNX"):
             save_data_ib_broker_file(file)
 
         # DIF BROKER FILE
