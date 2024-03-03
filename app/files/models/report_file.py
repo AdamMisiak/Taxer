@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 from utils.models import Broker
+from core.celery import debug_task
 
 class ReportFile(models.Model):
     file = models.FileField()
@@ -16,4 +17,12 @@ class ReportFile(models.Model):
         verbose_name_plural = "Report files"
 
     def __str__(self):
-        return f"{self.file}"
+        return f"{ReportFile.__name__} - {self.file} - {self.broker} - by: {self.user}"
+
+    def save(self, *args, **kwargs):
+        if self.id is not None:
+            print(f"♻️  Updated: {self}\n")
+        else:
+            print(f"✅ Created: {self}\n")
+        debug_task.delay()
+        super(ReportFile, self).save(*args, **kwargs)
