@@ -127,8 +127,17 @@ STATIC_URL = "static/"
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
+
+# Utils
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 TAX_RATE = 0.19
 
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 1500
+
+
+# Celery
+CELERY_TIMEZONE = "Europe/Warsaw"
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60
+CELERY_BROKER_URL = 'redis://redis:6379'
