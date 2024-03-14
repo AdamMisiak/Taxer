@@ -1,7 +1,6 @@
 from django.db import models
 from django.conf import settings
 from utils.models import Broker
-from core.celery import debug_task
 
 class ReportFile(models.Model):
     file = models.FileField()
@@ -20,9 +19,13 @@ class ReportFile(models.Model):
         return f"{ReportFile.__name__} - {self.file} - {self.broker} - by: {self.user}"
 
     def save(self, *args, **kwargs):
+        from files.tasks import save_data_from_report_file
+        
         if self.id is not None:
             print(f"♻️  Updated: {self}\n")
         else:
             print(f"✅ Created: {self}\n")
-        debug_task.delay()
+
         super(ReportFile, self).save(*args, **kwargs)
+
+        save_data_from_report_file.delay(self.id)
