@@ -54,6 +54,7 @@ services:
   celery-worker:
     container_name: celery-worker
     build: .
+    env_file: .env
     command: celery -A core worker -l info
     volumes:
       - ./app:/app
@@ -67,6 +68,7 @@ services:
   celery-beat:
     container_name: celery-beat
     build: .
+    env_file: .env
     command: celery -A core beat -l info
     volumes:
       - ./app:/app
