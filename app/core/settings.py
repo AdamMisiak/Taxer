@@ -141,3 +141,8 @@ CELERY_TIMEZONE = "Europe/Warsaw"
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 30 * 60
 CELERY_BROKER_URL = 'redis://redis:6379'
+
+
+# Constants
+INTERACTIVE_BROKERS = "Interactive Brokers"
+LYNX = "Lynx"
