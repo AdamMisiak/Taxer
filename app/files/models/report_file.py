@@ -19,7 +19,7 @@ class ReportFile(models.Model):
         return f"{ReportFile.__name__} - {self.file} - {self.broker} - by: {self.user}"
 
     def save(self, *args, **kwargs):
-        from files.tasks import save_data_from_report_file
+        from files.logic import save_data_from_report_file
         
         if self.id is not None:
             print(f"♻️  Updated: {self}\n")
