@@ -1,7 +1,7 @@
 from celery import shared_task
 from files.models import ReportFile, CurrencyRateFile
 from django.conf import settings
-from files.logic import save_data_ib_lynx_report_file, save_data_currency_rate_file
+from files.logic import save_data_ib_lynx_report_file
 
 broker_name_mapping = {
     settings.INTERACTIVE_BROKERS: save_data_ib_lynx_report_file,
@@ -23,12 +23,13 @@ def save_data_from_report_file(report_file_id: int):
 
 @shared_task
 def save_data_from_currency_rate_file(currency_rate_file_id: int):
+    from files.logic import save_data_currency_rate_file
+
     print("⚡️ Celery task: save_data_from_curenncy_rate_file function started.")
-    # NOTE add some standar logging at the beginning of the task
-    print(CurrencyRateFile.objects.get(id=currency_rate_file_id))
     curenncy_rate_file_object = CurrencyRateFile.objects.get(id=currency_rate_file_id)
 
     with curenncy_rate_file_object.file.open("r") as file:
-
         if curenncy_rate_file_object.file.name.startswith("Rates"):
             save_data_currency_rate_file(file)
+        else:
+            raise Exception("❌ Currency Rate file name has to begin with `Rates`!")

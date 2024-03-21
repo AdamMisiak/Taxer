@@ -2,7 +2,7 @@ import csv
 import re
 from datetime import datetime
 
-from transactions.models import CurrencyRate
+from rates.models import CurrencyRate
 
 
 def save_data_currency_rate_file(file):
@@ -12,7 +12,6 @@ def save_data_currency_rate_file(file):
         if len(row) == 0 or not re.match(r"^([\d]+)$", row[0]):
             continue
 
-        # NOTE sprawdzic czy na pewno dobrze zapisuje waluty - porownac ze strona jakas inna kursy
         CurrencyRate.objects.get_or_create(
             date=datetime.strptime(row[0], "%Y%m%d"),
             defaults={

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from files.models import ReportFile
+from files.models import ReportFile, CurrencyRateFile
 
 
 class ReportFileAdmin(admin.ModelAdmin):
@@ -15,4 +15,9 @@ class ReportFileAdmin(admin.ModelAdmin):
         instance.save()
         return instance
 
+class CurrencyRateFileAdmin(admin.ModelAdmin):
+    list_display = ("id", "file", "created_at")
+
+
 admin.site.register(ReportFile, ReportFileAdmin)
+admin.site.register(CurrencyRateFile, CurrencyRateFileAdmin)

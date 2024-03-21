@@ -1,3 +1,2 @@
 from .ib_lynx_report_file import save_data_ib_lynx_report_file
-from .tasks import save_data_from_currency_rate_file, save_data_from_report_file
 from .currency_rate_file import save_data_currency_rate_file

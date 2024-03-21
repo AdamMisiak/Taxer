@@ -12,14 +12,14 @@ class ReportFile(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        verbose_name = "Report file"
-        verbose_name_plural = "Report files"
+        verbose_name = "Report file 📊"
+        verbose_name_plural = "Report files 📊"
 
     def __str__(self):
         return f"{ReportFile.__name__} - {self.file} - {self.broker} - by: {self.user}"
 
     def save(self, *args, **kwargs):
-        from files.logic import save_data_from_report_file
+        from files.tasks import save_data_from_report_file
         
         if self.id is not None:
             print(f"♻️  Updated: {self}\n")
