@@ -10,8 +10,8 @@ class CurrencyRate(models.Model):
     rub = models.FloatField(null=True, blank=True)
 
     class Meta:
-        verbose_name = "Currency rate"
-        verbose_name_plural = "Currency rates"
+        verbose_name = "Currency rate 💹"
+        verbose_name_plural = "Currency rates 💹"
 
     def __str__(self):
         return f"{CurrencyRate.__name__} - {self.date} - {self.usd} USD"
