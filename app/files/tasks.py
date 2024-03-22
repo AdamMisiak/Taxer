@@ -17,7 +17,10 @@ def save_data_from_report_file(report_file_id: int):
     broker_name = report_file_object.broker.name
 
     with report_file_object.file.open("r") as file:
-        broker_name_mapping[broker_name](file)
+        try:
+            broker_name_mapping[broker_name](file)
+        except KeyError:
+            raise Exception("❌ Report file broker is not available!")
 
 
 
@@ -33,3 +36,5 @@ def save_data_from_currency_rate_file(currency_rate_file_id: int):
             save_data_currency_rate_file(file)
         else:
             raise Exception("❌ Currency Rate file name has to begin with `Rates`!")
+
+# NOTE add custom exception!
