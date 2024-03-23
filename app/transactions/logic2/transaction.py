@@ -1,9 +1,10 @@
 from datetime import datetime, timedelta
 import re
+from rates.models import CurrencyRate
+from utils.logic import get_previous_day_curreny_rate
 # from transactions.models import CurrencyRate, Transaction, WithholdingTax
 
 def save_ib_lynx_transaction(row: list[str]):
-    # NOTE REFACTOR THIS!!!
     asset_name_index = 5
     asset_type_index = 3
     price_index = 8
@@ -14,7 +15,8 @@ def save_ib_lynx_transaction(row: list[str]):
     executed_at_index = 6
 
     executed_at = datetime.strptime(row[executed_at_index], "%Y-%m-%d, %H:%M:%S") + timedelta(hours=6)
-    previous_day_currency_rate = CurrencyRate.objects.filter(date__lt=executed_at).order_by("-date").first()
+    # NOTE filter by curreny also?
+    previous_day_currency_rate = get_previous_day_curreny_rate(executed_at)
 
     asset_name = row[asset_name_index]
     asset_type = (

@@ -14,6 +14,7 @@ def _clean_up_row_ib_lynx_report_file(row: list[str]):
         del row[2]
 
 def save_data_ib_lynx_report_file(file):
+    from transactions.logic2 import save_ib_lynx_transaction
     # from transactions.logic import save_withholding_tax_transaction_object_ib_broker, save_trade_transaction_object, save_dividend_transaction_object, save_interest_rates_transaction_object
 
     csvreader = csv.reader(file)
@@ -27,13 +28,13 @@ def save_data_ib_lynx_report_file(file):
         # INTEREST RATES
         if row_type == "Interest" and row[1] == "Data" and "Investment Loan Interest for" in row[4]:
             print(row)
+            print("interest!!!")
             # save_interest_rates_transaction_object(row)
 
         # TRANSACTION
         if row_type == "Trades" and row[1] == "Data":
-            print(row)
             _clean_up_row_ib_lynx_report_file(row)
-            # save_trade_transaction_object(row)
+            save_ib_lynx_transaction(row)
 
         # # DIVIDEND
         # if row_type == "Dividends" and row[1] == "Data" and not row[2].startswith("Total"):
