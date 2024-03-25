@@ -7,3 +7,13 @@ class AssetType(models.TextChoices):
 
 class TransactionSide(models.TextChoices):
     BUY = "buy", "Buy"
+    SELL = "sell", "Sell"
+
+class Currency(models.TextChoices):
+    USD = "usd", "USD"
+    EUR = "eur", "EUR"
+    GBP = "gbp", "GBP"
+    RUB = "rub", "RUB"
+
+
+# NOTE add brokers like this aslo?
