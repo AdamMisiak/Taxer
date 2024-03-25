@@ -45,9 +45,10 @@ class BaseTransaction(models.Model):
     previous_day_currency_rate = models.ForeignKey(CurrencyRate, related_name="transactions2", on_delete=models.RESTRICT, blank=True, null=True)
 
     asset_name = models.CharField(max_length=124)
-    # NOTE is it needed? Bc there will be separated models for each type
 
+    # NOTE is it needed? Bc there will be separated models for each type
     asset_type = models.CharField(max_length=124, choices=AssetType.choices)
+    # NOTE div won't have side
     side = models.CharField(max_length=8, choices=TransactionSide.choices, blank=True)
     currency = models.CharField(max_length=3, choices=Currency.choices)
 
@@ -70,9 +71,10 @@ class BaseTransaction(models.Model):
     # withholding_tax = models.ForeignKey("Transaction", related_name="dividends", on_delete=models.CASCADE, blank=True, null=True)
 
     class Meta:
-        verbose_name = "Base transaction"
-        verbose_name_plural = "Base transactions"
-        # unique_together = ("asset_name", "side", "price", "quantity", "executed_at")
+        abstract = True
+        # verbose_name = "Base transaction"
+        # verbose_name_plural = "Base transactions"
+
 
     def colored_side(self):
         color_code = "008000" if self.side == "Buy" else "D2042D"
@@ -82,10 +84,6 @@ class BaseTransaction(models.Model):
     #     if self.asset_type in ["Dividends", "Withholding Tax", "Others"]:
     #         return (
     #             f"{self.asset_name} {self.value} {self.currency} - {self.executed_at}"
-    #         )
-    #     elif self.asset_type in ["Stocks", "ETFs", "Forex"]:
-    #         return (
-    #             f"{self.side} {self.quantity} {self.asset_name} @ {self.price} {self.currency} - {self.executed_at.date()}"
     #         )
     #     elif self.asset_type == "Equity and Index Options":
     #         return (

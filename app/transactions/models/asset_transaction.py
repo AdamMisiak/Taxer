@@ -11,6 +11,7 @@ from transactions.models import BaseTransaction
 
 
 class AssetTransaction(BaseTransaction):
+    # NOTE why null and blank?
     price = models.FloatField(null=True, blank=True)
     fee = models.FloatField(null=True, blank=True)
     quantity = models.FloatField(null=True, blank=True)
@@ -24,8 +25,16 @@ class AssetTransaction(BaseTransaction):
     class Meta:
         verbose_name = "Asset transaction"
         verbose_name_plural = "Asset transactions"
+        unique_together = ("asset_name", "side", "price", "quantity", "executed_at")
 
-    def __str__(self):
-        return (
-            f"{self.side} {self.quantity} {self.asset_name} @ {self.price} {self.currency} - {self.executed_at.date()}"
-        )
+    # def __str__(self):
+    #     print([f.name for f in AssetTransaction._meta.get_fields()])
+    #     return f"{AssetTransaction.__name__} - {self.side} {self.quantity} {self.asset_name} @ {self.price} {self.currency} - {self.executed_at.date()}"
+
+    def save(self, *args, **kwargs):
+        if self.id is not None:
+            print(f"♻️  Updated: {self}\n")
+        else:
+            print(f"✅ Created: {self}\n")
+
+        super(AssetTransaction, self).save(*args, **kwargs)

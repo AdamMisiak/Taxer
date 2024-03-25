@@ -1,5 +1,5 @@
 from django.contrib import admin
-from transactions.models import CurrencyRate, WithholdingTax, ImportFile, TaxCalculation, TaxSummary, Transaction
+from transactions.models import CurrencyRate, WithholdingTax, ImportFile, TaxCalculation, TaxSummary, Transaction, BaseTransaction, AssetTransaction
 
 
 class ImportFileAdmin(admin.ModelAdmin):
@@ -72,10 +72,37 @@ class TransactionAdmin(admin.ModelAdmin):
         TaxCalculationClosingInline,
     ]
 
+# class BaseTransactionAdmin(admin.ModelAdmin):
+#     list_display = (
+#         "asset_name",
+#         "asset_type",
+#     )
+#     list_filter = ("asset_type",)
+#     search_fields = ("asset_name", "asset_type")
+#     ordering = ("asset_name",)
+
+
+class AssetTransactionAdmin(admin.ModelAdmin):
+    date_hierarchy = "executed_at"
+    list_display = (
+        "asset_name",
+        "colored_side",
+        "asset_type",
+        "price",
+        "quantity",
+        "value",
+        "value_pln",
+        "currency",
+        # "fee",
+        "executed_at",
+    )
+    list_filter = ("side", "asset_type", "currency", "executed_at")
+    search_fields = ("asset_name", "asset_type")
+    ordering = ("-executed_at", "asset_name", "fee", "quantity", "value", "value_pln")
 
 class TaxSummaryAdmin(admin.ModelAdmin):
-    list_display = ("year", "tax", "revenue", "cost")
-    ordering = ("-year", "tax", "revenue", "cost")
+    list_display = ("year", "tax_equity", "tax_dividend", "revenue_equity", "revenue_dividend", "cost_equity", "tax_paid_dividend")
+    ordering = ("-year", "tax_equity", "tax_dividend", "revenue_equity", "revenue_dividend", "cost_equity", "tax_paid_dividend")
 
 
 class TaxCalculationAdmin(admin.ModelAdmin):
@@ -104,6 +131,8 @@ admin.site.register(ImportFile, ImportFileAdmin)
 # admin.site.register(Dividend, DividendAdmin)
 admin.site.register(WithholdingTax, WithholdingTaxAdmin)
 admin.site.register(Transaction, TransactionAdmin)
+# admin.site.register(BaseTransaction, BaseTransactionAdmin)
+admin.site.register(AssetTransaction, AssetTransactionAdmin)
 admin.site.register(CurrencyRate, CurrencyRateAdmin)
 admin.site.register(TaxSummary, TaxSummaryAdmin)
 admin.site.register(TaxCalculation, TaxCalculationAdmin)
