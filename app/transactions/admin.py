@@ -72,15 +72,6 @@ class TransactionAdmin(admin.ModelAdmin):
         TaxCalculationClosingInline,
     ]
 
-# class BaseTransactionAdmin(admin.ModelAdmin):
-#     list_display = (
-#         "asset_name",
-#         "asset_type",
-#     )
-#     list_filter = ("asset_type",)
-#     search_fields = ("asset_name", "asset_type")
-#     ordering = ("asset_name",)
-
 
 class AssetTransactionAdmin(admin.ModelAdmin):
     date_hierarchy = "executed_at"
@@ -99,6 +90,38 @@ class AssetTransactionAdmin(admin.ModelAdmin):
     list_filter = ("side", "asset_type", "currency", "executed_at")
     search_fields = ("asset_name", "asset_type")
     ordering = ("-executed_at", "asset_name", "fee", "quantity", "value", "value_pln")
+
+    fieldsets = (
+        (
+            "Base",
+            {
+                "fields": (
+                    "user",
+                    "broker",
+                    "previous_day_currency_rate",
+                    "asset_name",
+                    "asset_type",
+                    "side",
+                    "currency",
+                    "executed_at",
+                )
+            },
+        ),
+        (
+            "Custom",
+            {
+                "fields": (
+                    "price",
+                    "fee",
+                    "quantity",
+                    "value",
+                    "full_value",
+                    "value_pln",
+                    "full_value_pln",
+                )
+            },
+        )
+    )
 
 class TaxSummaryAdmin(admin.ModelAdmin):
     list_display = ("year", "tax_equity", "tax_dividend", "revenue_equity", "revenue_dividend", "cost_equity", "tax_paid_dividend")
