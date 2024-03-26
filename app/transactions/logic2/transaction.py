@@ -2,6 +2,8 @@ from datetime import datetime, timedelta
 import re
 from rates.models import CurrencyRate
 from utils.logic import get_previous_day_curreny_rate
+from transactions.models import AssetTransaction
+from django.contrib.auth.models import User
 # from transactions.models import CurrencyRate, Transaction, WithholdingTax
 
 def save_ib_lynx_transaction(row: list[str]):
@@ -17,6 +19,8 @@ def save_ib_lynx_transaction(row: list[str]):
     executed_at = datetime.strptime(row[executed_at_index], "%Y-%m-%d, %H:%M:%S") + timedelta(hours=6)
     # NOTE filter by curreny also?
     previous_day_currency_rate = get_previous_day_curreny_rate(executed_at)
+    # NOTE how to get user here?
+    user = User.objects.get(email="admin@admin.com")
 
     asset_name = row[asset_name_index]
     asset_type = (
@@ -32,7 +36,6 @@ def save_ib_lynx_transaction(row: list[str]):
     side = "Buy" if quantity_raw > 0 else "Sell"
     quantity = abs(quantity_raw)
     currency = row[currency_index]
-    # NOTE Watch of for forex records
     price = round(float(row[price_index]), 2)
     value = round(abs(float(row[value_index])), 2)
     value_pln = (
@@ -43,24 +46,23 @@ def save_ib_lynx_transaction(row: list[str]):
     full_value_pln = (
         round(full_value * getattr(previous_day_currency_rate, currency.lower()), 2) if currency.lower() != "pln" else full_value
     )
-    is_option = asset_type == "Equity and Index Options"
 
-    Transaction.objects.get_or_create(
+    AssetTransaction.objects.get_or_create(
         asset_name=asset_name,
         side=side,
         price=price,
         quantity=quantity,
         executed_at=executed_at,
         defaults={
+            "user": user,
             "asset_type": asset_type,
             "value": value,
             "full_value": full_value,
             "value_pln": value_pln,
             "full_value_pln": full_value_pln,
             "currency": currency,
-            "previous_day_currency_rate": previous_day_currency_rate,
+            # NOTE something is failing here
+            # "previous_day_currency_rate": previous_day_currency_rate,
             "fee": fee,
-            "option_type": _get_option_type(asset_name) if is_option else "",
-            "strike_price": _get_strike_price(asset_name) if is_option else None,
         },
     )
