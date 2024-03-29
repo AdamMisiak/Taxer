@@ -46,7 +46,6 @@ class BaseTransaction(models.Model):
 
     asset_name = models.CharField(max_length=124)
 
-    # NOTE is it needed? Bc there will be separated models for each type
     asset_type = models.CharField(max_length=124, choices=AssetType.choices)
     # NOTE div won't have side
     side = models.CharField(max_length=8, choices=TransactionSide.choices, blank=True)
@@ -77,7 +76,7 @@ class BaseTransaction(models.Model):
 
 
     def colored_side(self):
-        color_code = "008000" if self.side == "Buy" else "D2042D"
+        color_code = "008000" if self.side == TransactionSide.BUY.value else "D2042D"
         return format_html(f'<span style="color: #{color_code};">{self.side}</span>')
 
     # def __str__(self):
@@ -93,8 +92,8 @@ class BaseTransaction(models.Model):
     #         f"{self.side} {self.quantity} {self.asset_name} @ {self.price} {self.currency} - {self.executed_at.date()}"
     #     )
 
-    def save(self, *args, **kwargs):
-        raise Exception("ADD HERE EXCEPTION")
+    # def save(self, *args, **kwargs):
+    #     raise Exception("ADD HERE EXCEPTION")
     #     # NOTE add different message when updating with different
     #     if self.id is not None:
     #         print(f"🆕 Updated Transaction object ({self.asset_type}): {self}\n")

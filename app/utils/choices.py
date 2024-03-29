@@ -6,7 +6,7 @@ class AssetType(models.TextChoices):
     # SECOND_STEP = "secondStep", "Second step"
 
 class TransactionSide(models.TextChoices):
-    BUY = "Suy", "Buy"
+    BUY = "Buy", "Buy"
     SELL = "Sell", "Sell"
 
 class Currency(models.TextChoices):
