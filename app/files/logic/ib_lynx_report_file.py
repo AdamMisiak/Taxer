@@ -1,3 +1,4 @@
+from utils.choices import AssetType, TransactionSide, Currency
 import csv
 
 def _clean_up_row_ib_lynx_report_file(row: list[str]):
@@ -28,11 +29,12 @@ def save_data_ib_lynx_report_file(file):
         # INTEREST RATES
         if row_type == "Interest" and row[1] == "Data" and "Investment Loan Interest for" in row[4]:
             print(row)
-            print("interest!!!")
+            # print("interest!!!")
             # save_interest_rates_transaction_object(row)
 
-        # TRANSACTION
-        if row_type == "Trades" and row[1] == "Data":
+        # ASSETS
+        if row_type == "Trades" and row[1] == "Data" and row[3] in [AssetType.STOCKS.value]:
+            print(row)
             _clean_up_row_ib_lynx_report_file(row)
             save_ib_lynx_transaction(row)
 
