@@ -3,7 +3,7 @@ from django.conf import settings
 from utils.models import Broker
 from django.utils.html import format_html
 
-from .currency_rate import CurrencyRate
+# from .currency_rate import CurrencyRate
 from .withholding_tax import WithholdingTax
 
 from utils.choices import AssetType, TransactionSide, Currency
@@ -27,7 +27,7 @@ class AssetTransaction(BaseTransaction):
         unique_together = ("asset_name", "side", "price", "quantity", "executed_at")
 
     def __str__(self):
-        return f"{AssetTransaction.__name__} - {self.side} {self.quantity} {self.asset_name} @ {self.price} {self.currency} - {self.executed_at.date()}"
+        return f"{AssetTransaction.__name__} - {self.side} {self.quantity} {self.asset_name} @ {self.price} {self.currency} ({self.executed_at.date()})"
 
     def save(self, *args, **kwargs):
         #NOTE a co jak bedize ETF?

@@ -3,8 +3,8 @@ from django.conf import settings
 from utils.models import Broker
 from django.utils.html import format_html
 
-from .currency_rate import CurrencyRate
 from .withholding_tax import WithholdingTax
+from rates.models import CurrencyRate
 
 from utils.choices import AssetType, TransactionSide, Currency
 # SIDE_CHOICES = [
