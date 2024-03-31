@@ -3,8 +3,8 @@ from django.conf import settings
 from utils.models import Broker
 from django.utils.html import format_html
 
-from .withholding_tax import WithholdingTax
 from rates.models import CurrencyRate
+from files.models import ReportFile
 
 from utils.choices import AssetType, TransactionSide, Currency
 # SIDE_CHOICES = [
@@ -37,11 +37,7 @@ OPTION_TYPE_CHOICES = [
 
 
 class BaseTransaction(models.Model):
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-    )
-    broker = models.ForeignKey(Broker, blank=True, null=True, on_delete=models.CASCADE)
+    report_file = models.ForeignKey(ReportFile, related_name="transactions", on_delete=models.RESTRICT, blank=True, null=True,)
     previous_day_currency_rate = models.ForeignKey(CurrencyRate, related_name="transactions2", on_delete=models.RESTRICT, blank=True, null=True)
 
     asset_name = models.CharField(max_length=124)
