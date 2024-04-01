@@ -11,6 +11,8 @@ from transactions.models import BaseTransaction
 
 
 class AssetTransaction(BaseTransaction):
+    side = models.CharField(max_length=8, choices=TransactionSide.choices, blank=True)
+    
     price = models.FloatField()
     fee = models.FloatField()
     quantity = models.FloatField()

@@ -43,8 +43,6 @@ class BaseTransaction(models.Model):
     asset_name = models.CharField(max_length=124)
 
     asset_type = models.CharField(max_length=124, choices=AssetType.choices)
-    # NOTE div won't have side
-    side = models.CharField(max_length=8, choices=TransactionSide.choices, blank=True)
     currency = models.CharField(max_length=3, choices=Currency.choices)
 
     executed_at = models.DateTimeField(blank=True, null=True)
@@ -67,8 +65,6 @@ class BaseTransaction(models.Model):
 
     class Meta:
         abstract = True
-        # verbose_name = "Base transaction"
-        # verbose_name_plural = "Base transactions"
 
 
     def colored_side(self):
