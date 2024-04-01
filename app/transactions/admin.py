@@ -93,24 +93,23 @@ class AssetTransactionAdmin(admin.ModelAdmin):
 
     fieldsets = (
         (
-            "Base",
+            "Base info",
             {
                 "fields": (
-                    "user",
-                    "broker",
+                    "report_file",
                     "previous_day_currency_rate",
                     "asset_name",
                     "asset_type",
-                    "side",
                     "currency",
                     "executed_at",
                 )
             },
         ),
         (
-            "Custom",
+            "Asset info",
             {
                 "fields": (
+                    "side",
                     "price",
                     "fee",
                     "quantity",

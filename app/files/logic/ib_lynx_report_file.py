@@ -1,4 +1,7 @@
 from utils.choices import AssetType, TransactionSide, Currency
+from django.conf import settings
+from files.models import ReportFile
+from utils.models import Broker
 import csv
 
 def _clean_up_row_ib_lynx_report_file(row: list[str]):
@@ -14,7 +17,7 @@ def _clean_up_row_ib_lynx_report_file(row: list[str]):
     if row[2].startswith("U") and row[2][1:].isnumeric():
         del row[2]
 
-def save_data_ib_lynx_report_file(file):
+def save_data_ib_lynx_report_file(file, report_file_object: ReportFile):
     from transactions.logic2 import save_ib_lynx_transaction
     # from transactions.logic import save_withholding_tax_transaction_object_ib_broker, save_trade_transaction_object, save_dividend_transaction_object, save_interest_rates_transaction_object
 
@@ -36,7 +39,7 @@ def save_data_ib_lynx_report_file(file):
         if row_type == "Trades" and row[1] == "Data" and row[3] in [AssetType.STOCKS.value]:
             print(row)
             _clean_up_row_ib_lynx_report_file(row)
-            save_ib_lynx_transaction(row)
+            save_ib_lynx_transaction(row, report_file_object)
 
         # # DIVIDEND
         # if row_type == "Dividends" and row[1] == "Data" and not row[2].startswith("Total"):

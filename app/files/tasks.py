@@ -19,7 +19,7 @@ def save_data_from_report_file(report_file_id: int):
 
     with report_file_object.file.open("r") as file:
         try:
-            broker_name_mapping[broker_name](file)
+            broker_name_mapping[broker_name](file, report_file_object)
         except KeyError:
             raise ImportException("❌ Report file broker is not available!")
 
