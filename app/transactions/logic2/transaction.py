@@ -8,8 +8,7 @@ from transactions.models import AssetTransaction
 from utils.choices import AssetType, TransactionSide, Currency
 from django.contrib.auth.models import User
 
-# NOTE change the name to ASSETTRANSACITONS? separated file for each type of transactions? I think so
-def save_ib_lynx_transaction(row: list[str], report_file_object: ReportFile):
+def save_ib_lynx_asset_transaction(row: list[str], report_file_object: ReportFile):
     asset_name_index = 5
     asset_type_index = 3
     price_index = 8
@@ -50,23 +49,21 @@ def save_ib_lynx_transaction(row: list[str], report_file_object: ReportFile):
         round(full_value * getattr(previous_day_currency_rate, currency.lower()), 2) if currency.lower() != "pln" else full_value
     )
 
-    # NOTE double check which fields should be in defaults 
-    # NOTE plus correct order
     AssetTransaction.objects.get_or_create(
-        report_file=report_file_object,
         asset_name=asset_name,
         side=side,
         price=price,
         quantity=quantity,
         executed_at=executed_at,
         defaults={
+            "report_file": report_file_object,
+            "previous_day_currency_rate": previous_day_currency_rate,
             "asset_type": asset_type,
+            "currency": currency,
+            "fee": fee,
             "value": value,
             "full_value": full_value,
             "value_pln": value_pln,
             "full_value_pln": full_value_pln,
-            "currency": currency,
-            "previous_day_currency_rate": previous_day_currency_rate,
-            "fee": fee,
         },
     )
