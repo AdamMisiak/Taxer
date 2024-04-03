@@ -1,5 +1,5 @@
 from django.contrib import admin
-from transactions.models import CurrencyRate, WithholdingTax, ImportFile, TaxCalculation, TaxSummary, Transaction, BaseTransaction, AssetTransaction
+from transactions.models import CurrencyRate, WithholdingTax, ImportFile, TaxCalculation, TaxSummary, Transaction, BaseTransaction, AssetTransaction, DividendTransaction
 
 
 class ImportFileAdmin(admin.ModelAdmin):
@@ -122,6 +122,47 @@ class AssetTransactionAdmin(admin.ModelAdmin):
         )
     )
 
+class DividendTransactionAdmin(admin.ModelAdmin):
+    date_hierarchy = "executed_at"
+    list_display = (
+        "asset_name",
+        "value",
+        "value_per_share",
+        "value_pln",
+        "currency",
+        # "withholding_tax",
+        "executed_at",
+    )
+    list_filter = ("currency", "executed_at")
+    search_fields = ("asset_name",)
+    ordering = ("-executed_at", "asset_name", "value_per_share", "value", "value_pln")
+    fieldsets = (
+        (
+            "Base info",
+            {
+                "fields": (
+                    "report_file",
+                    "previous_day_currency_rate",
+                    "asset_name",
+                    "asset_type",
+                    "currency",
+                    "executed_at",
+                )
+            },
+        ),
+        (
+            "Asset info",
+            {
+                "fields": (
+                    # "withholding_tax",
+                    "value",
+                    "value_per_share",
+                    "value_pln",
+                )
+            },
+        )
+    )
+
 class TaxSummaryAdmin(admin.ModelAdmin):
     list_display = ("year", "tax_equity", "tax_dividend", "revenue_equity", "revenue_dividend", "cost_equity", "tax_paid_dividend")
     ordering = ("-year", "tax_equity", "tax_dividend", "revenue_equity", "revenue_dividend", "cost_equity", "tax_paid_dividend")
@@ -155,6 +196,8 @@ admin.site.register(WithholdingTax, WithholdingTaxAdmin)
 admin.site.register(Transaction, TransactionAdmin)
 # admin.site.register(BaseTransaction, BaseTransactionAdmin)
 admin.site.register(AssetTransaction, AssetTransactionAdmin)
+admin.site.register(DividendTransaction, DividendTransactionAdmin)
+
 admin.site.register(CurrencyRate, CurrencyRateAdmin)
 admin.site.register(TaxSummary, TaxSummaryAdmin)
 admin.site.register(TaxCalculation, TaxCalculationAdmin)

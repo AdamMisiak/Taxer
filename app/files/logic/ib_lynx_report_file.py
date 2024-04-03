@@ -37,15 +37,17 @@ def save_data_ib_lynx_report_file(file, report_file_object: ReportFile):
 
         # ASSETS
         if row_type == "Trades" and row[1] == "Data" and row[3] in [AssetType.STOCKS.value]:
-            print(row)
+            # print(row)
             _clean_up_row_ib_lynx_report_file(row)
             save_ib_lynx_asset_transaction(row, report_file_object)
 
-        # # DIVIDEND
-        # if row_type == "Dividends" and row[1] == "Data" and not row[2].startswith("Total"):
-        #     _validate_row_ib_broker_file(row)
-        #     save_dividend_transaction_object(row)
-        #     # save_dividend_object(row)
+        # DIVIDEND
+        if row_type == AssetType.DIVIDENDS.value and row[1] == "Data" and not row[2].startswith("Total"):
+            print("DIV")
+            print(row)
+            # _validate_row_ib_broker_file(row)
+            # save_dividend_transaction_object(row)
+            # save_dividend_object(row)
 
         # # WITHHOLDING TAX
         # elif row_type == "Withholding Tax" and row[1] == "Data" and not row[2].startswith("Total"):

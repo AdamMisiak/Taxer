@@ -1,1 +1,1 @@
-from .transaction import save_ib_lynx_asset_transaction
+from .asset_transaction import save_ib_lynx_asset_transaction
