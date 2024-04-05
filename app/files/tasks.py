@@ -12,7 +12,6 @@ broker_name_mapping = {
 @shared_task
 def save_data_from_report_file(report_file_id: int):
     print("⚡️ Celery task: save_data_from_report_file function started.")
-    # NOTE add some standar logging at the beginning of the task
 
     report_file_object = ReportFile.objects.get(id=report_file_id)
     broker_name = report_file_object.broker.name
