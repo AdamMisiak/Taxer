@@ -2,7 +2,7 @@ from django.db import models
 
 class AssetType(models.TextChoices):
     STOCKS = "Stocks", "Stocks"
-    # DIVIDENDS = "Dividends", "Dividends"
+    DIVIDENDS = "Dividends", "Dividends"
     # TEST = "test", "Test"
     # SECOND_STEP = "secondStep", "Second step"
 

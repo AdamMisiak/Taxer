@@ -18,7 +18,7 @@ def _clean_up_row_ib_lynx_report_file(row: list[str]):
         del row[2]
 
 def save_data_ib_lynx_report_file(file, report_file_object: ReportFile):
-    from transactions.logic2 import save_ib_lynx_asset_transaction
+    from transactions.logic2 import save_ib_lynx_asset_transaction, save_ib_lynx_dividend_transaction
     # from transactions.logic import save_withholding_tax_transaction_object_ib_broker, save_trade_transaction_object, save_dividend_transaction_object, save_interest_rates_transaction_object
 
     csvreader = csv.reader(file)
@@ -45,6 +45,8 @@ def save_data_ib_lynx_report_file(file, report_file_object: ReportFile):
         if row_type == AssetType.DIVIDENDS.value and row[1] == "Data" and not row[2].startswith("Total"):
             print("DIV")
             print(row)
+            _clean_up_row_ib_lynx_report_file(row)
+            save_ib_lynx_dividend_transaction(row, report_file_object)
             # _validate_row_ib_broker_file(row)
             # save_dividend_transaction_object(row)
             # save_dividend_object(row)
