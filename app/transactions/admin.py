@@ -158,6 +158,7 @@ class DividendTransactionAdmin(admin.ModelAdmin):
                     "value",
                     "value_per_share",
                     "value_pln",
+                    "raw_data",
                 )
             },
         )

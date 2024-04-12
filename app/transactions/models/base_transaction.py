@@ -37,8 +37,8 @@ OPTION_TYPE_CHOICES = [
 
 
 class BaseTransaction(models.Model):
-    report_file = models.ForeignKey(ReportFile, related_name="transactions", on_delete=models.RESTRICT, blank=True, null=True,)
-    previous_day_currency_rate = models.ForeignKey(CurrencyRate, related_name="transactions2", on_delete=models.RESTRICT, blank=True, null=True)
+    report_file = models.ForeignKey(ReportFile, on_delete=models.RESTRICT, blank=True, null=True,)
+    previous_day_currency_rate = models.ForeignKey(CurrencyRate, on_delete=models.RESTRICT, blank=True, null=True)
 
     asset_name = models.CharField(max_length=124)
 

@@ -16,6 +16,8 @@ class DividendTransaction(BaseTransaction):
     value_per_share = models.FloatField(blank=True, null=True)
     value_pln = models.FloatField()
 
+    raw_data = models.TextField(max_length=1256, blank=True, null=True)
+
     class Meta:
         verbose_name = "Dividend transaction"
         verbose_name_plural = "Dividend transactions"

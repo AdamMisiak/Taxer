@@ -5,3 +5,6 @@ from .tax_summary import TaxSummary
 from .transaction import Transaction
 # from .do_not_delete_dividend import Dividend
 from .withholding_tax import WithholdingTax
+from .base_transaction import BaseTransaction
+from .dividend_transaction import DividendTransaction
+from .asset_transaction import AssetTransaction
