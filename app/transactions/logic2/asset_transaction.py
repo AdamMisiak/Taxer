@@ -1,12 +1,8 @@
 from datetime import datetime, timedelta
-import re
-from rates.models import CurrencyRate
 from files.models import ReportFile
 from utils.logic import get_previous_day_curreny_rate
-from utils.models import Broker
 from transactions.models import AssetTransaction
-from utils.choices import AssetType, TransactionSide, Currency
-from django.contrib.auth.models import User
+from utils.choices import TransactionSide, Currency
 
 def save_ib_lynx_asset_transaction(row: list[str], report_file_object: ReportFile):
     asset_name_index = 5
