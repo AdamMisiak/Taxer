@@ -1,6 +1,9 @@
 from django.contrib import admin
-from transactions.models import CurrencyRate, WithholdingTax, ImportFile, TaxCalculation, TaxSummary, Transaction, BaseTransaction, AssetTransaction, DividendTransaction
+from transactions.models import CurrencyRate, WithholdingTax, ImportFile, TaxCalculation, TaxSummary, Transaction, BaseTransaction, AssetTransaction, DividendTransaction, WithholdingTaxTransaction
 
+BASE_INFO = "Base info"
+ASSET_INFO = "Asset info"
+RELATIONS = "Relations"
 
 class ImportFileAdmin(admin.ModelAdmin):
     list_display = ("id", "file", "created_at")
@@ -93,7 +96,7 @@ class AssetTransactionAdmin(admin.ModelAdmin):
 
     fieldsets = (
         (
-            "Base info",
+            BASE_INFO,
             {
                 "fields": (
                     "report_file",
@@ -106,7 +109,7 @@ class AssetTransactionAdmin(admin.ModelAdmin):
             },
         ),
         (
-            "Asset info",
+            ASSET_INFO,
             {
                 "fields": (
                     "side",
@@ -130,7 +133,7 @@ class DividendTransactionAdmin(admin.ModelAdmin):
         "value_per_share",
         "value_pln",
         "currency",
-        # "withholding_tax",
+        "withholding_tax_transaction",
         "executed_at",
     )
     list_filter = ("currency", "executed_at")
@@ -138,11 +141,21 @@ class DividendTransactionAdmin(admin.ModelAdmin):
     ordering = ("-executed_at", "asset_name", "value_per_share", "value", "value_pln")
     fieldsets = (
         (
-            "Base info",
+            RELATIONS,
             {
                 "fields": (
                     "report_file",
                     "previous_day_currency_rate",
+                    "withholding_tax_transaction",
+                )
+            },
+        ),
+        (
+            BASE_INFO,
+            {
+                "fields": (
+                    # "report_file",
+                    # "previous_day_currency_rate",
                     "asset_name",
                     "asset_type",
                     "currency",
@@ -151,12 +164,60 @@ class DividendTransactionAdmin(admin.ModelAdmin):
             },
         ),
         (
-            "Asset info",
+            ASSET_INFO,
             {
                 "fields": (
-                    # "withholding_tax",
+                    # "withholding_tax_transaction",
                     "value",
                     "value_per_share",
+                    "value_pln",
+                    "raw_data",
+                )
+            },
+        )
+    )
+
+# NOTE add nested dividend model here? (inline)
+class WithholdingTaxTransactionAdmin(admin.ModelAdmin):
+    date_hierarchy = "executed_at"
+    list_display = (
+        "asset_name",
+        "value",
+        "value_pln",
+        "currency",
+        "executed_at",
+    )
+    list_filter = ("currency", "executed_at")
+    search_fields = ("asset_name",)
+    ordering = ("-executed_at", "asset_name", "value", "value_pln")
+    fieldsets = (
+        (
+            "Relations",
+            {
+                "fields": (
+                    "report_file",
+                    "previous_day_currency_rate",
+                )
+            },
+        ),
+        (
+            BASE_INFO,
+            {
+                "fields": (
+                    # "report_file",
+                    # "previous_day_currency_rate",
+                    "asset_name",
+                    "asset_type",
+                    "currency",
+                    "executed_at",
+                )
+            },
+        ),
+        (
+            ASSET_INFO,
+            {
+                "fields": (
+                    "value",
                     "value_pln",
                     "raw_data",
                 )
@@ -198,6 +259,7 @@ admin.site.register(Transaction, TransactionAdmin)
 # admin.site.register(BaseTransaction, BaseTransactionAdmin)
 admin.site.register(AssetTransaction, AssetTransactionAdmin)
 admin.site.register(DividendTransaction, DividendTransactionAdmin)
+admin.site.register(WithholdingTaxTransaction, WithholdingTaxTransactionAdmin)
 
 admin.site.register(CurrencyRate, CurrencyRateAdmin)
 admin.site.register(TaxSummary, TaxSummaryAdmin)
