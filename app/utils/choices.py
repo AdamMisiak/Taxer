@@ -3,6 +3,7 @@ from django.db import models
 class AssetType(models.TextChoices):
     STOCKS = "Stocks", "Stocks"
     DIVIDENDS = "Dividends", "Dividends"
+    WITHHOLDING_TAX = "Withholding Tax", "Withholding Tax"
     # TEST = "test", "Test"
     # SECOND_STEP = "secondStep", "Second step"
 

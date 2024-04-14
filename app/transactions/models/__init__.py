@@ -8,3 +8,4 @@ from .withholding_tax import WithholdingTax
 from .base_transaction import BaseTransaction
 from .dividend_transaction import DividendTransaction
 from .asset_transaction import AssetTransaction
+from .withholding_tax_transaction import WithholdingTaxTransaction

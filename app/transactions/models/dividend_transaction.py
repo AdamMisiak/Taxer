@@ -1,16 +1,10 @@
 from django.db import models
-from django.conf import settings
-from utils.models import Broker
-from django.utils.html import format_html
 
-# from .currency_rate import CurrencyRate
-from .withholding_tax import WithholdingTax
-
-from utils.choices import AssetType, TransactionSide, Currency
+from utils.choices import AssetType
 from transactions.models import BaseTransaction
 
 class DividendTransaction(BaseTransaction):
-    # withholding_tax = models.ForeignKey("Transaction", related_name="dividends", on_delete=models.CASCADE, blank=True, null=True)
+    withholding_tax_transaction = models.OneToOneField("WithholdingTaxTransaction", related_name="dividend_transaction", on_delete=models.CASCADE, blank=True, null=True)
 
     value = models.FloatField()
     value_per_share = models.FloatField(blank=True, null=True)
