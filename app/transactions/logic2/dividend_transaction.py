@@ -2,7 +2,6 @@ import re
 from datetime import datetime
 from files.models import ReportFile
 from utils.logic import get_previous_day_curreny_rate
-from utils.logic import get_previous_day_curreny_rate
 from transactions.models import DividendTransaction
 from utils.choices import Currency
 

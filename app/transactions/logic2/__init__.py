@@ -1,2 +1,3 @@
 from .dividend_transaction import save_ib_lynx_dividend_transaction
 from .asset_transaction import save_ib_lynx_asset_transaction
+from .withholding_tax_transaction import save_ib_lynx_withholding_tax_transaction

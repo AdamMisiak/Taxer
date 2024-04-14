@@ -1,5 +1,4 @@
 from django.db import models
-from .withholding_tax import WithholdingTax
 
 from utils.choices import AssetType
 from transactions.models import BaseTransaction
@@ -16,7 +15,7 @@ class WithholdingTaxTransaction(BaseTransaction):
         # unique_together = ("asset_name", "value", "currency", "executed_at")
 
     def __str__(self):
-        return f"{WithholdingTax.__name__} - {self.asset_name} {self.value} {self.currency} ({self.executed_at.date()})"
+        return f"{WithholdingTaxTransaction.__name__} - {self.asset_name} {self.value} {self.currency} ({self.executed_at.date()})"
 
     def save(self, *args, **kwargs):
         self.asset_type = AssetType.WITHHOLDING_TAX.value
@@ -26,4 +25,4 @@ class WithholdingTaxTransaction(BaseTransaction):
         else:
             print(f"✅ Created: {self}\n")
 
-        super(WithholdingTax, self).save(*args, **kwargs)
+        super(WithholdingTaxTransaction, self).save(*args, **kwargs)
