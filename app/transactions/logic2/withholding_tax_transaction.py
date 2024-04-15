@@ -38,37 +38,32 @@ def save_ib_lynx_withholding_tax_transaction(row: list[str], report_file_object:
 
 
     # TODO test that it is working fine with change of the order
-    withholding_tax_transaction, _ = WithholdingTaxTransaction.objects.get_or_create(
+    withholding_tax_transaction, created = WithholdingTaxTransaction.objects.get_or_create(
         asset_name=asset_name,
-        # asset_type=asset_type,
         value=value,
         value_pln=value_pln,
-        # currency=currency,
-        # previous_day_currency_rate=previous_day_currency_rate,
         executed_at=executed_at,
+        raw_data=str(row),
         defaults={
             "report_file": report_file_object,
             "previous_day_currency_rate": previous_day_currency_rate,
             "asset_type": asset_type,
             "currency": currency,
-            "raw_data": str(row)
+            # "raw_data": str(row)
         }
     )
-    print(withholding_tax_transaction)
-    # if created:
-    value_filter = {"value__gt": 0} if value > 0 else {"value__lt": 0}
-    matching_dividend_transaction = DividendTransaction.objects.get(
-        asset_name=asset_name,
-        asset_type=AssetType.DIVIDENDS.value,
-        value_per_share=value_per_share,
-        currency=currency,
-        previous_day_currency_rate=previous_day_currency_rate,
-        executed_at=executed_at,
-        withholding_tax_transaction__isnull=True,
-        **value_filter,
-    )
-    print(matching_dividend_transaction)
-    print(matching_dividend_transaction.withholding_tax_transaction)
-    matching_dividend_transaction.withholding_tax_transaction = withholding_tax_transaction
-    matching_dividend_transaction.save()
-    print(matching_dividend_transaction.withholding_tax_transaction)
+  
+    if created:
+        value_filter = {"value__gt": 0} if value > 0 else {"value__lt": 0}
+        matching_dividend_transaction = DividendTransaction.objects.get(
+            asset_name=asset_name,
+            asset_type=AssetType.DIVIDENDS.value,
+            value_per_share=value_per_share,
+            currency=currency,
+            previous_day_currency_rate=previous_day_currency_rate,
+            executed_at=executed_at,
+            withholding_tax_transaction__isnull=True,
+            **value_filter,
+        )
+        matching_dividend_transaction.withholding_tax_transaction = withholding_tax_transaction
+        matching_dividend_transaction.save()
