@@ -44,6 +44,8 @@ class BaseTransaction(models.Model):
 
     asset_type = models.CharField(max_length=124, choices=AssetType.choices)
     currency = models.CharField(max_length=3, choices=Currency.choices)
+    
+    raw_data = models.TextField(max_length=1256, blank=True, null=True)
 
     executed_at = models.DateTimeField(blank=True, null=True)
 

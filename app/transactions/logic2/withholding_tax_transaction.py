@@ -3,7 +3,6 @@ from datetime import datetime
 from files.models import ReportFile
 from utils.logic import get_previous_day_curreny_rate
 from transactions.models import DividendTransaction, WithholdingTaxTransaction
-from utils.choices import Currency
 from utils.choices import AssetType
 
 
@@ -49,7 +48,6 @@ def save_ib_lynx_withholding_tax_transaction(row: list[str], report_file_object:
             "previous_day_currency_rate": previous_day_currency_rate,
             "asset_type": asset_type,
             "currency": currency,
-            # "raw_data": str(row)
         }
     )
   

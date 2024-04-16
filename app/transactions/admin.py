@@ -120,6 +120,7 @@ class AssetTransactionAdmin(admin.ModelAdmin):
                     "full_value",
                     "value_pln",
                     "full_value_pln",
+                    "raw_data",
                 )
             },
         )

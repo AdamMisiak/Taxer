@@ -7,8 +7,6 @@ class WithholdingTaxTransaction(BaseTransaction):
     value = models.FloatField()
     value_pln = models.FloatField()
 
-    raw_data = models.TextField(max_length=1256, blank=True, null=True)
-
     class Meta:
         verbose_name = "Withholding Tax transaction"
         verbose_name_plural = "Withholding Tax transactions"
