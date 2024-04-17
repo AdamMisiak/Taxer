@@ -18,7 +18,7 @@ def _clean_up_row_ib_lynx_report_file(row: list[str]):
         del row[2]
 
 def save_data_ib_lynx_report_file(file, report_file_object: ReportFile):
-    from transactions.logic2 import save_ib_lynx_asset_transaction, save_ib_lynx_dividend_transaction, save_ib_lynx_withholding_tax_transaction
+    from transactions.logic2 import save_ib_lynx_asset_transaction, save_ib_lynx_dividend_transaction, save_ib_lynx_withholding_tax_transaction, save_ib_lynx_option_transaction
     # from transactions.logic import save_withholding_tax_transaction_object_ib_broker, save_trade_transaction_object, save_dividend_transaction_object, save_interest_rates_transaction_object
 
     csvreader = csv.reader(file)
@@ -41,7 +41,13 @@ def save_data_ib_lynx_report_file(file, report_file_object: ReportFile):
             _clean_up_row_ib_lynx_report_file(row)
             save_ib_lynx_asset_transaction(row, report_file_object)
 
-        # DIVIDEND
+        # OPTIONS
+        if row_type == "Trades" and row[1] == "Data" and row[3] == "Equity and Index Options":
+            # print(row)
+            _clean_up_row_ib_lynx_report_file(row)
+            save_ib_lynx_option_transaction(row, report_file_object)
+
+        # DIVIDENDS
         if row_type == AssetType.DIVIDENDS.value and row[1] == "Data" and not row[2].startswith("Total"):
             _clean_up_row_ib_lynx_report_file(row)
             save_ib_lynx_dividend_transaction(row, report_file_object)
@@ -49,7 +55,7 @@ def save_data_ib_lynx_report_file(file, report_file_object: ReportFile):
             # save_dividend_transaction_object(row)
             # save_dividend_object(row)
 
-        # WITHHOLDING TAX
+        # WITHHOLDING TAXES
         elif row_type == AssetType.WITHHOLDING_TAX.value and row[1] == "Data" and not row[2].startswith("Total"):
             _clean_up_row_ib_lynx_report_file(row)
             save_ib_lynx_withholding_tax_transaction(row, report_file_object)

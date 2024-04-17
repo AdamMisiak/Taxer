@@ -2,6 +2,7 @@ from django.db import models
 
 class AssetType(models.TextChoices):
     STOCKS = "Stocks", "Stocks"
+    OPTIONS = "Options", "Options"
     DIVIDENDS = "Dividends", "Dividends"
     WITHHOLDING_TAX = "Withholding Tax", "Withholding Tax"
     # TEST = "test", "Test"
@@ -17,5 +18,7 @@ class Currency(models.TextChoices):
     GBP = "GGP", "GBP"
     RUB = "RUB", "RUB"
 
+class OptionType(models.TextChoices):
+    CALL = "CALL", "CALL"
+    PUT = "PUT", "PUT"
 
-# NOTE add brokers like this aslo?

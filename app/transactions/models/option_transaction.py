@@ -36,8 +36,7 @@ class OptionTransaction(BaseTransaction):
         return f"{OptionTransaction.__name__} - {self.side} {self.option_type} {self.quantity} {self.asset_name} @ {self.price} {self.currency} ({self.executed_at.date()})"
 
     def save(self, *args, **kwargs):
-        #NOTE a co jak bedize ETF?
-        self.asset_type = AssetType.STOCKS.value
+        self.asset_type = AssetType.OPTIONS.value
 
         if self.id is not None:
             print(f"♻️  Updated: {self}\n")
