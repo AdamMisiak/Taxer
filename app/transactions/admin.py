@@ -1,5 +1,5 @@
 from django.contrib import admin
-from transactions.models import CurrencyRate, WithholdingTax, ImportFile, TaxCalculation, TaxSummary, Transaction, BaseTransaction, AssetTransaction, DividendTransaction, WithholdingTaxTransaction
+from transactions.models import CurrencyRate, WithholdingTax, ImportFile, InterestRateTransaction, TaxCalculation, TaxSummary, Transaction, OptionTransaction, BaseTransaction, AssetTransaction, DividendTransaction, WithholdingTaxTransaction
 
 BASE_INFO = "Base info"
 ASSET_INFO = "Asset info"
@@ -126,6 +126,58 @@ class AssetTransactionAdmin(admin.ModelAdmin):
         )
     )
 
+class OptionTransactionAdmin(admin.ModelAdmin):
+    date_hierarchy = "executed_at"
+    list_display = (
+        "asset_name",
+        "colored_side",
+        "asset_type",
+        "option_type",
+        "price",
+        "strike_price",
+        "quantity",
+        "value",
+        "value_pln",
+        "currency",
+        # "fee",
+        "executed_at",
+    )
+    list_filter = ("side", "asset_type", "option_type", "currency", "executed_at")
+    search_fields = ("asset_name", "asset_type", "option_type")
+    ordering = ("-executed_at", "asset_name", "fee", "quantity", "value", "value_pln")
+
+    fieldsets = (
+        (
+            BASE_INFO,
+            {
+                "fields": (
+                    "report_file",
+                    "previous_day_currency_rate",
+                    "asset_name",
+                    "asset_type",
+                    "currency",
+                    "executed_at",
+                    "raw_data",
+                )
+            },
+        ),
+        (
+            ASSET_INFO,
+            {
+                "fields": (
+                    "side",
+                    "price",
+                    "fee",
+                    "quantity",
+                    "value",
+                    "full_value",
+                    "value_pln",
+                    "full_value_pln",
+                )
+            },
+        )
+    )
+
 class DividendTransactionAdmin(admin.ModelAdmin):
     date_hierarchy = "executed_at"
     list_display = (
@@ -161,6 +213,7 @@ class DividendTransactionAdmin(admin.ModelAdmin):
                     "asset_type",
                     "currency",
                     "executed_at",
+                    "raw_data",
                 )
             },
         ),
@@ -172,7 +225,6 @@ class DividendTransactionAdmin(admin.ModelAdmin):
                     "value",
                     "value_per_share",
                     "value_pln",
-                    "raw_data",
                 )
             },
         )
@@ -211,6 +263,7 @@ class WithholdingTaxTransactionAdmin(admin.ModelAdmin):
                     "asset_type",
                     "currency",
                     "executed_at",
+                    "raw_data",
                 )
             },
         ),
@@ -220,7 +273,49 @@ class WithholdingTaxTransactionAdmin(admin.ModelAdmin):
                 "fields": (
                     "value",
                     "value_pln",
+                )
+            },
+        )
+    )
+
+
+class InterestRateTransactionAdmin(admin.ModelAdmin):
+    date_hierarchy = "executed_at"
+    list_display = (
+        "asset_name",
+        "colored_side",
+        "asset_type",
+        "value",
+        "value_pln",
+        "currency",
+        "executed_at",
+    )
+    list_filter = ("side", "currency", "executed_at")
+    search_fields = ("asset_name", "asset_type")
+    ordering = ("-executed_at", "asset_name", "value", "value_pln")
+
+    fieldsets = (
+        (
+            BASE_INFO,
+            {
+                "fields": (
+                    "report_file",
+                    "previous_day_currency_rate",
+                    "asset_name",
+                    "asset_type",
+                    "currency",
+                    "executed_at",
                     "raw_data",
+                )
+            },
+        ),
+        (
+            ASSET_INFO,
+            {
+                "fields": (
+                    "side",
+                    "value",
+                    "value_pln",
                 )
             },
         )
@@ -259,8 +354,10 @@ admin.site.register(WithholdingTax, WithholdingTaxAdmin)
 admin.site.register(Transaction, TransactionAdmin)
 # admin.site.register(BaseTransaction, BaseTransactionAdmin)
 admin.site.register(AssetTransaction, AssetTransactionAdmin)
+admin.site.register(OptionTransaction, OptionTransactionAdmin)
 admin.site.register(DividendTransaction, DividendTransactionAdmin)
 admin.site.register(WithholdingTaxTransaction, WithholdingTaxTransactionAdmin)
+admin.site.register(InterestRateTransaction, InterestRateTransactionAdmin)
 
 admin.site.register(CurrencyRate, CurrencyRateAdmin)
 admin.site.register(TaxSummary, TaxSummaryAdmin)

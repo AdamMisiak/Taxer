@@ -5,8 +5,7 @@ class AssetType(models.TextChoices):
     OPTIONS = "Options", "Options"
     DIVIDENDS = "Dividends", "Dividends"
     WITHHOLDING_TAX = "Withholding Tax", "Withholding Tax"
-    # TEST = "test", "Test"
-    # SECOND_STEP = "secondStep", "Second step"
+    OTHERS = "Others", "Others"
 
 class TransactionSide(models.TextChoices):
     BUY = "Buy", "Buy"
