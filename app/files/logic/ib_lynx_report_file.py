@@ -18,7 +18,7 @@ def _clean_up_row_ib_lynx_report_file(row: list[str]):
         del row[2]
 
 def save_data_ib_lynx_report_file(file, report_file_object: ReportFile):
-    from transactions.logic2 import save_ib_lynx_asset_transaction, save_ib_lynx_dividend_transaction, save_ib_lynx_withholding_tax_transaction, save_ib_lynx_option_transaction
+    from transactions.logic2 import save_ib_lynx_asset_transaction, save_ib_lynx_dividend_transaction, save_ib_lynx_withholding_tax_transaction, save_ib_lynx_option_transaction, save_ib_lynx_interest_rate_transaction_object
     # from transactions.logic import save_withholding_tax_transaction_object_ib_broker, save_trade_transaction_object, save_dividend_transaction_object, save_interest_rates_transaction_object
 
     csvreader = csv.reader(file)
@@ -31,9 +31,7 @@ def save_data_ib_lynx_report_file(file, report_file_object: ReportFile):
         # # NOTE oddzielnie zysk z opcji i akcji i oddzielnie dywidendy
         # INTEREST RATES
         if row_type == "Interest" and row[1] == "Data" and "Investment Loan Interest for" in row[4]:
-            print(row)
-            # print("interest!!!")
-            # save_interest_rates_transaction_object(row)
+            save_ib_lynx_interest_rate_transaction_object(row, report_file_object)
 
         # ASSETS
         if row_type == "Trades" and row[1] == "Data" and row[3] in [AssetType.STOCKS.value]:

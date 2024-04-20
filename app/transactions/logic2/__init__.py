@@ -2,3 +2,4 @@ from .asset_transaction import save_ib_lynx_asset_transaction
 from .option_transaction import save_ib_lynx_option_transaction
 from .dividend_transaction import save_ib_lynx_dividend_transaction
 from .withholding_tax_transaction import save_ib_lynx_withholding_tax_transaction
+from .interest_rate_transaction import save_ib_lynx_interest_rate_transaction_object
