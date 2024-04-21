@@ -2,7 +2,11 @@ from django.contrib import admin
 from transactions.models import CurrencyRate, WithholdingTax, ImportFile, InterestRateTransaction, TaxCalculation, TaxSummary, Transaction, OptionTransaction, BaseTransaction, AssetTransaction, DividendTransaction, WithholdingTaxTransaction
 
 BASE_INFO = "Base info"
+OTHER_INFO = "Other info"
 ASSET_INFO = "Asset info"
+DIVIDEND_INFO = "Dividend info"
+WITHHOLDING_TAX_INFO = "Withholding tax info"
+OPTION_INFO = "Option info"
 RELATIONS = "Relations"
 
 class ImportFileAdmin(admin.ModelAdmin):
@@ -96,11 +100,18 @@ class AssetTransactionAdmin(admin.ModelAdmin):
 
     fieldsets = (
         (
-            BASE_INFO,
+            RELATIONS,
             {
                 "fields": (
                     "report_file",
                     "previous_day_currency_rate",
+                )
+            },
+        ),
+        (
+            BASE_INFO,
+            {
+                "fields": (
                     "asset_name",
                     "asset_type",
                     "currency",
@@ -148,11 +159,19 @@ class OptionTransactionAdmin(admin.ModelAdmin):
 
     fieldsets = (
         (
-            BASE_INFO,
+            RELATIONS,
             {
                 "fields": (
                     "report_file",
                     "previous_day_currency_rate",
+                )
+            },
+        ),
+        (
+            
+            BASE_INFO,
+            {
+                "fields": (
                     "asset_name",
                     "asset_type",
                     "currency",
@@ -173,6 +192,15 @@ class OptionTransactionAdmin(admin.ModelAdmin):
                     "full_value",
                     "value_pln",
                     "full_value_pln",
+                )
+            },
+        ),
+        (
+            OPTION_INFO,
+            {
+                "fields": (
+                    "strike_price",
+                    "option_type",
                 )
             },
         )
@@ -207,8 +235,6 @@ class DividendTransactionAdmin(admin.ModelAdmin):
             BASE_INFO,
             {
                 "fields": (
-                    # "report_file",
-                    # "previous_day_currency_rate",
                     "asset_name",
                     "asset_type",
                     "currency",
@@ -218,7 +244,7 @@ class DividendTransactionAdmin(admin.ModelAdmin):
             },
         ),
         (
-            ASSET_INFO,
+            DIVIDEND_INFO,
             {
                 "fields": (
                     # "withholding_tax_transaction",
@@ -245,7 +271,7 @@ class WithholdingTaxTransactionAdmin(admin.ModelAdmin):
     ordering = ("-executed_at", "asset_name", "value", "value_pln")
     fieldsets = (
         (
-            "Relations",
+            RELATIONS,
             {
                 "fields": (
                     "report_file",
@@ -257,8 +283,6 @@ class WithholdingTaxTransactionAdmin(admin.ModelAdmin):
             BASE_INFO,
             {
                 "fields": (
-                    # "report_file",
-                    # "previous_day_currency_rate",
                     "asset_name",
                     "asset_type",
                     "currency",
@@ -268,7 +292,7 @@ class WithholdingTaxTransactionAdmin(admin.ModelAdmin):
             },
         ),
         (
-            ASSET_INFO,
+            WITHHOLDING_TAX_INFO,
             {
                 "fields": (
                     "value",
@@ -296,11 +320,18 @@ class InterestRateTransactionAdmin(admin.ModelAdmin):
 
     fieldsets = (
         (
-            BASE_INFO,
+            RELATIONS,
             {
                 "fields": (
                     "report_file",
                     "previous_day_currency_rate",
+                )
+            },
+        ),
+        (
+            BASE_INFO,
+            {
+                "fields": (
                     "asset_name",
                     "asset_type",
                     "currency",
@@ -310,7 +341,7 @@ class InterestRateTransactionAdmin(admin.ModelAdmin):
             },
         ),
         (
-            ASSET_INFO,
+            OTHER_INFO,
             {
                 "fields": (
                     "side",
