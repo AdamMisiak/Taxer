@@ -1,15 +1,23 @@
 from django.db import models
 
 from transactions.models import AssetTransaction
+from tax_calculations.models import BaseTaxCalculation
 
 
-class AssetTaxCalculation(models.Model):
+class AssetTaxCalculation(BaseTaxCalculation):
     opening_transaction = models.ForeignKey(
         AssetTransaction,
         related_name="as_opening_calculation",
         on_delete=models.CASCADE,
         blank=True,
         null=True,
+    )
+    closing_transaction = models.ForeignKey(
+        AssetTransaction,
+        related_name="as_closing_calculation",
+        on_delete=models.CASCADE,
+        # blank=True,
+        # null=True,
     )
 
     quantity = models.FloatField(blank=True, null=True)

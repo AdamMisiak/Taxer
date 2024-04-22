@@ -19,13 +19,13 @@ class BaseTaxCalculation(models.Model):
     #     blank=True,
     #     null=True,
     # )
-    closing_transaction = models.ForeignKey(
-        BaseTransaction,
-        related_name="as_closing_calculation",
-        on_delete=models.CASCADE,
-        blank=True,
-        null=True,
-    )
+    # closing_transaction = models.ForeignKey(
+    #     BaseTransaction,
+    #     related_name="as_closing_calculation",
+    #     on_delete=models.CASCADE,
+    #     blank=True,
+    #     null=True,
+    # )
     revenue = models.FloatField()
     cost = models.FloatField()
     profit_or_loss = models.FloatField()
