@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 import os
 from pathlib import Path
+from celery.schedules import crontab
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -143,6 +144,12 @@ CELERY_TIMEZONE = "Europe/Warsaw"
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 30 * 60
 CELERY_BROKER_URL = 'redis://redis:6379'
+CELERY_BEAT_SCHEDULE = {
+    "create_tax_calculations": {
+        "task": "tax_calculations.tasks.create_tax_calculations",
+        "schedule": crontab(minute="*/1"),
+    },
+}
 
 
 # Constants
