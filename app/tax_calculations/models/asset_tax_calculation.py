@@ -37,4 +37,4 @@ class AssetTaxCalculation(BaseTaxCalculation):
         else:
             print(f"✅ Created: {self}\n")
 
-        super(AssetTransaction, self).save(*args, **kwargs)
+        super(AssetTaxCalculation, self).save(*args, **kwargs)
