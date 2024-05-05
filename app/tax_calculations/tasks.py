@@ -18,7 +18,8 @@ def create_tax_calculations():
     print("⚡️ Celery task: create_tax_calculations function started.")
 
     # NOTE maybe add dict with key = transaction type and value = function reference
-    sell_transactions_without_calculations = AssetTransaction.objects.filter(side=TransactionSide.SELL.value).order_by("executed_at")
+    # NOTE check how , as_closing_calculation__isnull=True is working (czy zadziala dla tych z quantity, jesli nie to zrobic OR w query i pokryc ten use case)
+    sell_transactions_without_calculations = AssetTransaction.objects.filter(side=TransactionSide.SELL.value, as_closing_calculation__isnull=True).order_by("executed_at")
     for sell_transaction in sell_transactions_without_calculations:
         create_asset_tax_calculations(sell_transaction)
 
