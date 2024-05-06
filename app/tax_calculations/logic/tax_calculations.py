@@ -25,10 +25,11 @@ def calculate_tax_multiple_transactions(matching_opening_transactions: QuerySet[
         if (
             opening_transaction.quantity == closing_transaction.quantity
             and not opening_transaction.as_opening_calculation.all()
-            # NOTE needed?
-            # and not closing_transaction.as_opening_calculation.all()
+            and not closing_transaction.as_opening_calculation.all()
         ):
             print(calculate_tax_single_transaction_same_quantity)
             calculate_tax_single_transaction_same_quantity(
                 opening_transaction=opening_transaction, closing_transaction=closing_transaction
             )
+        else:
+            print(f"❌ Transaction: {opening_transaction} has not been handled!")

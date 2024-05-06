@@ -16,6 +16,7 @@ class Currency(models.TextChoices):
     EUR = "EUR", "EUR"
     GBP = "GGP", "GBP"
     RUB = "RUB", "RUB"
+    PLN = "PLN", "PLN"
 
 class OptionType(models.TextChoices):
     CALL = "CALL", "CALL"
