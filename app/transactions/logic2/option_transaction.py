@@ -62,7 +62,6 @@ def save_ib_lynx_option_transaction(row: list[str], report_file_object: ReportFi
         option_type=_get_option_type(asset_name),
         strike_price=_get_strike_price(asset_name),
         executed_at=executed_at,
-        raw_data=str(row),
         defaults={
             "report_file": report_file_object,
             "previous_day_currency_rate": previous_day_currency_rate,
@@ -73,5 +72,6 @@ def save_ib_lynx_option_transaction(row: list[str], report_file_object: ReportFi
             "full_value": full_value,
             "value_pln": value_pln,
             "full_value_pln": full_value_pln,
+            "raw_data": str(row)
         },
     )
