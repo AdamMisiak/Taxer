@@ -1,5 +1,6 @@
 from django.contrib import admin
 from transactions.models import CurrencyRate, WithholdingTax, ImportFile, InterestRateTransaction, TaxCalculation, TaxSummary, Transaction, OptionTransaction, BaseTransaction, AssetTransaction, DividendTransaction, WithholdingTaxTransaction
+from tax_calculations.models import AssetTaxCalculation
 
 BASE_INFO = "Base info"
 OTHER_INFO = "Other info"
@@ -79,6 +80,18 @@ class TransactionAdmin(admin.ModelAdmin):
         TaxCalculationClosingInline,
     ]
 
+class AssetTaxCalculationOpeningInline(admin.StackedInline):
+    verbose_name_plural = "As Closing Tax Calculations"
+    model = AssetTaxCalculation
+    fk_name = "closing_transaction"
+    extra = 0
+
+
+class AssetTaxCalculationClosingInline(admin.StackedInline):
+    verbose_name_plural = "As Opening Tax Calculations"
+    model = AssetTaxCalculation
+    fk_name = "opening_transaction"
+    extra = 0
 
 class AssetTransactionAdmin(admin.ModelAdmin):
     date_hierarchy = "executed_at"
@@ -97,6 +110,10 @@ class AssetTransactionAdmin(admin.ModelAdmin):
     list_filter = ("side", "asset_type", "currency", "executed_at")
     search_fields = ("asset_name", "asset_type")
     ordering = ("-executed_at", "asset_name", "fee", "quantity", "value", "value_pln")
+    inlines = [
+        AssetTaxCalculationOpeningInline,
+        AssetTaxCalculationClosingInline,
+    ]
 
     fieldsets = (
         (
