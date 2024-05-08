@@ -19,17 +19,19 @@ def calculate_tax_single_transaction_same_quantity(opening_transaction: BaseTran
     )
 
 def calculate_tax_multiple_transactions(matching_opening_transactions: QuerySet[BaseTransaction], closing_transaction: BaseTransaction):
-    print(closing_transaction)
     for opening_transaction in matching_opening_transactions:
-        print(opening_transaction)
+        opening_transaction.refresh_from_db()
+        closing_transaction.refresh_from_db()
+
         if (
             opening_transaction.quantity == closing_transaction.quantity
             and not opening_transaction.as_opening_calculation.all()
             and not closing_transaction.as_opening_calculation.all()
         ):
-            print(calculate_tax_single_transaction_same_quantity)
             calculate_tax_single_transaction_same_quantity(
                 opening_transaction=opening_transaction, closing_transaction=closing_transaction
             )
+            break
         else:
+            # NOTE temp
             print(f"❌ Transaction: {opening_transaction} has not been handled!")
