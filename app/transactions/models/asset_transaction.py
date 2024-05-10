@@ -26,7 +26,7 @@ class AssetTransaction(BaseTransaction):
     class Meta:
         verbose_name = "Asset transaction"
         verbose_name_plural = "Asset transactions"
-        unique_together = ("asset_name", "side", "price", "quantity", "executed_at")
+        unique_together = ("asset_name", "side", "price", "quantity", "executed_at", "raw_data")
 
     def __str__(self):
         return f"{AssetTransaction.__name__} - {self.side} {self.quantity} {self.asset_name} @ {self.price} {self.currency} ({self.executed_at.date()})"

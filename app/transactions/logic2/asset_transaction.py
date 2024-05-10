@@ -51,6 +51,7 @@ def save_ib_lynx_asset_transaction(row: list[str], report_file_object: ReportFil
         price=price,
         quantity=quantity,
         executed_at=executed_at,
+        raw_data=str(row),
         defaults={
             "report_file": report_file_object,
             "previous_day_currency_rate": previous_day_currency_rate,
@@ -61,6 +62,5 @@ def save_ib_lynx_asset_transaction(row: list[str], report_file_object: ReportFil
             "full_value": full_value,
             "value_pln": value_pln,
             "full_value_pln": full_value_pln,
-            "raw_data": str(row)
         },
     )

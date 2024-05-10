@@ -42,12 +42,12 @@ def save_ib_lynx_dividend_transaction(row: list[str], report_file_object: Report
         value_per_share=value_per_share,
         value=value,
         value_pln=value_pln,
+        raw_data=str(row),
         executed_at=executed_at,
         defaults={
             "report_file": report_file_object,
             "previous_day_currency_rate": previous_day_currency_rate,
             "asset_type": asset_type,
             "currency": currency,
-            "raw_data": str(row)
         }
     )

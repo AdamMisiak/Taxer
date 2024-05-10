@@ -29,9 +29,9 @@ def save_ib_lynx_interest_rate_transaction_object(row: list[str], report_file_ob
         value=value,
         value_pln=value_pln,
         executed_at=executed_at,
+        raw_data=str(row),
         defaults={
             "report_file": report_file_object,
             "previous_day_currency_rate": previous_day_currency_rate,
-            "raw_data": str(row)
         },
     )

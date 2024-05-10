@@ -42,12 +42,12 @@ def save_ib_lynx_withholding_tax_transaction(row: list[str], report_file_object:
         value=value,
         value_pln=value_pln,
         executed_at=executed_at,
+        raw_data=str(row),
         defaults={
             "report_file": report_file_object,
             "previous_day_currency_rate": previous_day_currency_rate,
             "asset_type": asset_type,
             "currency": currency,
-            "raw_data": str(row)
         }
     )
   
