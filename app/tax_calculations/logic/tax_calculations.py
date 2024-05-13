@@ -18,20 +18,41 @@ def calculate_tax_single_transaction_same_quantity(opening_transaction: BaseTran
         tax=tax_to_pay_from_transaction,
     )
 
-def calculate_tax_multiple_transactions(matching_opening_transactions: QuerySet[BaseTransaction], closing_transaction: BaseTransaction):
-    for opening_transaction in matching_opening_transactions:
-        opening_transaction.refresh_from_db()
-        closing_transaction.refresh_from_db()
+# TODO refactor this names
+def _get_partial_quantity_for_transaction(closing_transaction_quantity, summary_opening_transaction_quantity):
+    quantity_used_in_current_transaction = closing_transaction_quantity - summary_opening_transaction_quantity
+    return quantity_used_in_current_transaction
 
+def calculate_tax_multiple_transactions(matching_opening_transactions: QuerySet[BaseTransaction], closing_transaction: BaseTransaction):
+    summary_opening_transactions_quantity = 0
+
+    for opening_transaction in matching_opening_transactions:
         if (
             opening_transaction.quantity == closing_transaction.quantity
             and not opening_transaction.as_opening_calculation.all()
             and not closing_transaction.as_opening_calculation.all()
         ):
+            print(f"ℹ️  Used first transaction with matching quantity: {opening_transaction}")
             calculate_tax_single_transaction_same_quantity(
                 opening_transaction=opening_transaction, closing_transaction=closing_transaction
             )
             break
+        elif opening_transaction.quantity <= closing_transaction.quantity and not opening_transaction.as_opening_calculation.all():
+            if summary_opening_transactions_quantity + opening_transaction.quantity <= closing_transaction.quantity:
+                summary_opening_transactions_quantity += opening_transaction.quantity
+                # NOTE add function creatingq AssetTaxCalculation with quantity 
+
+            # if summary_opening_transactions_quantity + opening_transaction.quantity > closing_transaction.quantity:
+            #     quantity = _get_partial_quantity_for_transaction(
+            #         closing_transaction.quantity, summary_opening_transaction_quantity
+            #     )
+            #     print(f"ℹ️  Used last partial transaction with {quantity} quantity: {transaction}")
+            #     _calculate_tax_equity_partial_different_quantity(transaction, closing_transaction, quantity)
+            #     break
+            # else:
+            #     summary_opening_transaction_quantity += opening_transaction.quantity
+            #     print(f"ℹ️  Used middle transaction: {transaction}")
+            #     _calculate_tax_equity_partial_different_quantity(transaction, closing_transaction)
         else:
             # NOTE temp
             print(f"❌ Transaction: {opening_transaction} has not been handled!")
