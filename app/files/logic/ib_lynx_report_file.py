@@ -29,7 +29,7 @@ def save_data_ib_lynx_report_file(file, report_file_object: ReportFile):
             save_ib_lynx_interest_rate_transaction_object(row, report_file_object)
 
         # ASSETS
-        if row_type == "Trades" and row[1] == "Data" and row[3] in [AssetType.STOCKS.value]:
+        if row_type == "Trades" and row[1] == "Data" and row[3].startswith(AssetType.STOCKS.value):
             _clean_up_row_ib_lynx_report_file(row)
             save_ib_lynx_asset_transaction(row, report_file_object)
 

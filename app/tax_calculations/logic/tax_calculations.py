@@ -18,6 +18,46 @@ def calculate_tax_single_transaction_same_quantity(opening_transaction: BaseTran
         tax=tax_to_pay_from_transaction,
     )
 
+# NOTE think about the name? "same" quantity?
+def calculate_tax_multiple_transactions_same_quantity(
+    opening_transaction: BaseTransaction, closing_transaction: BaseTransaction, quantity: int = None
+):
+    # ratio = quantity / opening_transaction.quantity if quantity else 1
+    # tax_year = closing_transaction.executed_at.year or opening_transaction.executed_at.year
+
+    # revenue = 0
+    # cost = round(opening_transaction.full_value_pln * ratio, 2)
+
+    # if quantity:
+    #     profit_or_loss = round(revenue - cost, 2)
+    # else:
+    #     profit_or_loss = round(-opening_transaction.full_value_pln, 2)
+    # tax = round(profit_or_loss * settings.TAX_RATE, 2)
+
+    # TaxCalculation.objects.create(
+    #     tax_summary=TaxSummary.objects.get(year=tax_year),
+    #     opening_transaction=opening_transaction,
+    #     closing_transaction=closing_transaction,
+    #     revenue=revenue,
+    #     cost=cost,
+    #     profit_or_loss=profit_or_loss,
+    #     tax=tax,
+    #     quantity=quantity,
+    # )
+    revenue = 0
+    cost = opening_transaction.full_value_pln
+    profit_or_loss = round(revenue - cost, 2)
+    tax_to_pay_from_transaction = round(profit_or_loss * settings.TAX_RATE, 2)
+    AssetTaxCalculation.objects.get_or_create(
+        # tax_summary=TaxSummary.objects.get(year=tax_year),
+        opening_transaction=opening_transaction,
+        closing_transaction=closing_transaction,
+        revenue=revenue,
+        cost=cost,
+        profit_or_loss=profit_or_loss,
+        tax=tax_to_pay_from_transaction,
+    )
+
 # TODO refactor this names
 def _get_partial_quantity_for_transaction(closing_transaction_quantity, summary_opening_transaction_quantity):
     quantity_used_in_current_transaction = closing_transaction_quantity - summary_opening_transaction_quantity
@@ -32,15 +72,20 @@ def calculate_tax_multiple_transactions(matching_opening_transactions: QuerySet[
             and not opening_transaction.as_opening_calculation.all()
             and not closing_transaction.as_opening_calculation.all()
         ):
-            print(f"ℹ️  Used first transaction with matching quantity: {opening_transaction}")
+            print(f"ℹ️  Used transaction with matching quantity: {opening_transaction}")
             calculate_tax_single_transaction_same_quantity(
                 opening_transaction=opening_transaction, closing_transaction=closing_transaction
             )
             break
         elif opening_transaction.quantity <= closing_transaction.quantity and not opening_transaction.as_opening_calculation.all():
-            if summary_opening_transactions_quantity + opening_transaction.quantity <= closing_transaction.quantity:
+            if summary_opening_transactions_quantity + opening_transaction.quantity < closing_transaction.quantity:
                 summary_opening_transactions_quantity += opening_transaction.quantity
-                # NOTE add function creatingq AssetTaxCalculation with quantity 
+                print(f"ℹ️  Used transaction with smaller partial quantity: {opening_transaction}")
+                calculate_tax_multiple_transactions_same_quantity(opening_transaction=opening_transaction, closing_transaction=closing_transaction)
+            # NOTE next step is handle use case when  summary_opening_transactions_quantity += opening_transaction.quantity is equal closing transaction
+            # when second opening transaction is matching with closing => closing whole tax calc
+            elif summary_opening_transactions_quantity + opening_transaction.quantity == closing_transaction.quantity:
+                pass
 
             # if summary_opening_transactions_quantity + opening_transaction.quantity > closing_transaction.quantity:
             #     quantity = _get_partial_quantity_for_transaction(
