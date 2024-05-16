@@ -81,12 +81,15 @@ def calculate_tax_multiple_transactions(matching_opening_transactions: QuerySet[
             if summary_opening_transactions_quantity + opening_transaction.quantity < closing_transaction.quantity:
                 summary_opening_transactions_quantity += opening_transaction.quantity
                 print(f"ℹ️  Used transaction with smaller partial quantity: {opening_transaction}")
+                print(f"ℹ️  Summary opening transactions quantity: {summary_opening_transactions_quantity}/{closing_transaction.quantity}")
                 calculate_tax_multiple_transactions_same_quantity(opening_transaction=opening_transaction, closing_transaction=closing_transaction)
-            # NOTE next step is handle use case when  summary_opening_transactions_quantity += opening_transaction.quantity is equal closing transaction
-            # when second opening transaction is matching with closing => closing whole tax calc
             elif summary_opening_transactions_quantity + opening_transaction.quantity == closing_transaction.quantity:
-                pass
-
+                summary_opening_transactions_quantity += opening_transaction.quantity
+                print(f"ℹ️  Used last transaction with matching partial quantity: {opening_transaction}")
+                print(f"ℹ️  Summary opening transactions quantity: {summary_opening_transactions_quantity}/{closing_transaction.quantity}")
+                calculate_tax_single_transaction_same_quantity(
+                    opening_transaction=opening_transaction, closing_transaction=closing_transaction
+                )
             # if summary_opening_transactions_quantity + opening_transaction.quantity > closing_transaction.quantity:
             #     quantity = _get_partial_quantity_for_transaction(
             #         closing_transaction.quantity, summary_opening_transaction_quantity
