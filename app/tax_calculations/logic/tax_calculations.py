@@ -68,7 +68,8 @@ def calculate_tax_multiple_transactions(matching_opening_transactions: QuerySet[
 
     for opening_transaction in matching_opening_transactions:
         if (
-            opening_transaction.quantity == closing_transaction.quantity
+            summary_opening_transactions_quantity == 0
+            and opening_transaction.quantity == closing_transaction.quantity
             and not opening_transaction.as_opening_calculation.all()
             and not closing_transaction.as_opening_calculation.all()
         ):
@@ -78,12 +79,13 @@ def calculate_tax_multiple_transactions(matching_opening_transactions: QuerySet[
             )
             break
         elif opening_transaction.quantity <= closing_transaction.quantity and not opening_transaction.as_opening_calculation.all():
-            summary_opening_transactions_quantity += opening_transaction.quantity
             if summary_opening_transactions_quantity + opening_transaction.quantity < closing_transaction.quantity:
+                summary_opening_transactions_quantity += opening_transaction.quantity
                 print(f"ℹ️  Used partial transaction with smaller quantity: {opening_transaction}")
                 print(f"ℹ️  Summary opening transactions quantity: {summary_opening_transactions_quantity}/{closing_transaction.quantity}")
                 calculate_tax_multiple_transactions_same_quantity(opening_transaction=opening_transaction, closing_transaction=closing_transaction)
             elif summary_opening_transactions_quantity + opening_transaction.quantity == closing_transaction.quantity:
+                summary_opening_transactions_quantity += opening_transaction.quantity
                 print(f"ℹ️  Used partial last transaction with matching quantity: {opening_transaction}")
                 print(f"ℹ️  Summary opening transactions quantity: {summary_opening_transactions_quantity}/{closing_transaction.quantity}")
                 calculate_tax_single_transaction_same_quantity(
@@ -95,6 +97,10 @@ def calculate_tax_multiple_transactions(matching_opening_transactions: QuerySet[
                 print(summary_opening_transactions_quantity)
                 print(opening_transaction.quantity)
                 print(closing_transaction.quantity)
+                remaining_quantity = closing_transaction.quantity - summary_opening_transactions_quantity
+                print(remaining_quantity)
+                summary_opening_transactions_quantity += remaining_quantity
+                # NOTE mark tax caluclation with quantity + prepare proper function to save quantity inside the db
                 # NOTE next handle AMT use case with 19 (?) + 100 stocks
                 # if summary_opening_transactions_quantity + opening_transaction.quantity > closing_transaction.quantity:
                 # something is wrong with AMT transactions - using this "Used full transaction with matching quantity" 
