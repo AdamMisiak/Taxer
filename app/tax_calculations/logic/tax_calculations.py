@@ -22,28 +22,6 @@ def calculate_tax_single_transaction_same_quantity(opening_transaction: BaseTran
 def calculate_tax_multiple_transactions_same_quantity(
     opening_transaction: BaseTransaction, closing_transaction: BaseTransaction, quantity: int = None
 ):
-    # ratio = quantity / opening_transaction.quantity if quantity else 1
-    # tax_year = closing_transaction.executed_at.year or opening_transaction.executed_at.year
-
-    # revenue = 0
-    # cost = round(opening_transaction.full_value_pln * ratio, 2)
-
-    # if quantity:
-    #     profit_or_loss = round(revenue - cost, 2)
-    # else:
-    #     profit_or_loss = round(-opening_transaction.full_value_pln, 2)
-    # tax = round(profit_or_loss * settings.TAX_RATE, 2)
-
-    # TaxCalculation.objects.create(
-    #     tax_summary=TaxSummary.objects.get(year=tax_year),
-    #     opening_transaction=opening_transaction,
-    #     closing_transaction=closing_transaction,
-    #     revenue=revenue,
-    #     cost=cost,
-    #     profit_or_loss=profit_or_loss,
-    #     tax=tax,
-    #     quantity=quantity,
-    # )
     revenue = 0
     cost = opening_transaction.full_value_pln
     profit_or_loss = round(revenue - cost, 2)
@@ -56,6 +34,28 @@ def calculate_tax_multiple_transactions_same_quantity(
         cost=cost,
         profit_or_loss=profit_or_loss,
         tax=tax_to_pay_from_transaction,
+    )
+
+def calculate_tax_multiple_transactions_different_quantity(
+    opening_transaction: BaseTransaction, closing_transaction: BaseTransaction, quantity: int = None
+):
+    ratio = quantity / opening_transaction.quantity
+    # tax_year = closing_transaction.executed_at.year or opening_transaction.executed_at.year
+
+    revenue = round(closing_transaction.full_value_pln, 2)
+    cost = round(opening_transaction.full_value_pln * ratio, 2)
+    profit_or_loss = round(revenue - cost, 2)
+    tax_to_pay_from_transaction = round(profit_or_loss * settings.TAX_RATE, 2)
+
+    AssetTaxCalculation.objects.get_or_create(
+        # tax_summary=TaxSummary.objects.get(year=tax_year),
+        opening_transaction=opening_transaction,
+        closing_transaction=closing_transaction,
+        revenue=revenue,
+        cost=cost,
+        profit_or_loss=profit_or_loss,
+        tax=tax_to_pay_from_transaction,
+        quantity=quantity,
     )
 
 # TODO refactor this names
@@ -81,30 +81,29 @@ def calculate_tax_multiple_transactions(matching_opening_transactions: QuerySet[
         elif opening_transaction.quantity <= closing_transaction.quantity and not opening_transaction.as_opening_calculation.all():
             if summary_opening_transactions_quantity + opening_transaction.quantity < closing_transaction.quantity:
                 summary_opening_transactions_quantity += opening_transaction.quantity
-                print(f"ℹ️  Used partial transaction with smaller quantity: {opening_transaction}")
+                print(f"ℹ️  Used (partial) middle transaction with smaller quantity: {opening_transaction}")
                 print(f"ℹ️  Summary opening transactions quantity: {summary_opening_transactions_quantity}/{closing_transaction.quantity}")
                 calculate_tax_multiple_transactions_same_quantity(opening_transaction=opening_transaction, closing_transaction=closing_transaction)
+            
             elif summary_opening_transactions_quantity + opening_transaction.quantity == closing_transaction.quantity:
                 summary_opening_transactions_quantity += opening_transaction.quantity
-                print(f"ℹ️  Used partial last transaction with matching quantity: {opening_transaction}")
+                print(f"ℹ️  Used (partial) last transaction with matching quantity: {opening_transaction}")
                 print(f"ℹ️  Summary opening transactions quantity: {summary_opening_transactions_quantity}/{closing_transaction.quantity}")
                 calculate_tax_single_transaction_same_quantity(
                     opening_transaction=opening_transaction, closing_transaction=closing_transaction
                 )
-            elif summary_opening_transactions_quantity + opening_transaction.quantity > closing_transaction.quantity:
-                print(" I AM HERE")
-                print(f"ℹ️  Summary opening transactions quantity: {summary_opening_transactions_quantity}/{closing_transaction.quantity}")
-                print(summary_opening_transactions_quantity)
-                print(opening_transaction.quantity)
-                print(closing_transaction.quantity)
-                remaining_quantity = closing_transaction.quantity - summary_opening_transactions_quantity
-                print(remaining_quantity)
-                summary_opening_transactions_quantity += remaining_quantity
-                # NOTE mark tax caluclation with quantity + prepare proper function to save quantity inside the db
-                # NOTE next handle AMT use case with 19 (?) + 100 stocks
-                # if summary_opening_transactions_quantity + opening_transaction.quantity > closing_transaction.quantity:
-                # something is wrong with AMT transactions - using this "Used full transaction with matching quantity" 
             
+            elif summary_opening_transactions_quantity < closing_transaction.quantity and summary_opening_transactions_quantity + opening_transaction.quantity > closing_transaction.quantity:
+                remaining_quantity = closing_transaction.quantity - summary_opening_transactions_quantity
+                summary_opening_transactions_quantity += remaining_quantity
+                print(f"ℹ️  Used (partial) last transaction with smaller quantity: {opening_transaction}")
+                print(f"ℹ️  Summary opening transactions quantity: {summary_opening_transactions_quantity}/{closing_transaction.quantity}")
+                calculate_tax_multiple_transactions_different_quantity(opening_transaction=opening_transaction, closing_transaction=closing_transaction, quantity=remaining_quantity)
+            
+            # NOTE next step: check if opening transaction -> related tax caluclation (as opening) -> has any quantity
+            # to use it again opening transaction with remaining quantity
+
+
             #     quantity = _get_partial_quantity_for_transaction(
             #         closing_transaction.quantity, summary_opening_transaction_quantity
             #     )
