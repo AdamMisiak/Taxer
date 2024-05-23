@@ -99,21 +99,20 @@ def calculate_tax_multiple_transactions(matching_opening_transactions: QuerySet[
                 print(f"ℹ️  Used (partial) last transaction with smaller quantity: {opening_transaction}")
                 print(f"ℹ️  Summary opening transactions quantity: {summary_opening_transactions_quantity}/{closing_transaction.quantity}")
                 calculate_tax_multiple_transactions_different_quantity(opening_transaction=opening_transaction, closing_transaction=closing_transaction, quantity=remaining_quantity)
+
+        elif opening_transaction.quantity <= closing_transaction.quantity and opening_transaction.as_opening_calculation.all() and opening_transaction.as_opening_calculation.last().quantity:
+            remaining_quantity = opening_transaction.quantity - opening_transaction.as_opening_calculation.last().quantity
+            summary_opening_transactions_quantity += remaining_quantity
+            print(f"ℹ️  Used (partial) first? transaction with smaller quantity: {opening_transaction}")
+            print(f"ℹ️  Summary opening transactions quantity: {summary_opening_transactions_quantity}/{closing_transaction.quantity}")
+            # NOTE it  is not calcualting correclty -> revenue should be 0
+            # create another function calculate_tax_multiple_transactions_different_quantity but for FIRST trans and change current one to LAST trans?
+            calculate_tax_multiple_transactions_different_quantity(opening_transaction=opening_transaction, closing_transaction=closing_transaction, quantity=remaining_quantity)
             
-            # NOTE next step: check if opening transaction -> related tax caluclation (as opening) -> has any quantity
-            # to use it again opening transaction with remaining quantity
 
-
-            #     quantity = _get_partial_quantity_for_transaction(
-            #         closing_transaction.quantity, summary_opening_transaction_quantity
-            #     )
-            #     print(f"ℹ️  Used last partial transaction with {quantity} quantity: {transaction}")
-            #     _calculate_tax_equity_partial_different_quantity(transaction, closing_transaction, quantity)
-            #     break
-            # else:
-            #     summary_opening_transaction_quantity += opening_transaction.quantity
-            #     print(f"ℹ️  Used middle transaction: {transaction}")
-            #     _calculate_tax_equity_partial_different_quantity(transaction, closing_transaction)
+            # NOTE check if all transacations are covered
+        
+        # NOTE maybe check if there are as_opening_calculation and no quantity -> message that this transaction is already clacualted/addressed
         else:
             # NOTE temp
             print(f"❌ Transaction: {opening_transaction} has not been handled!")
