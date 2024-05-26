@@ -2,6 +2,7 @@ from django.db import models
 
 # from .tax_summary import TaxSummary
 from transactions.models import BaseTransaction
+from django.utils.html import format_html
 
 
 class BaseTaxCalculation(models.Model):
@@ -37,6 +38,10 @@ class BaseTaxCalculation(models.Model):
     class Meta:
         abstract = True
 
+    def colored_tax(self):
+        color_code = "008000" if self.tax > 0 else "D2042D"
+        return format_html(f'<span style="color: #{color_code};">{self.tax}</span>')
+    
     # def __str__(self):
     #     custom_quantity = f"Custom quantity: {self.quantity}" if self.quantity is not None else ""
     #     return f"{self.opening_transaction} <> {self.closing_transaction} {custom_quantity} Tax: {self.tax} PLN"

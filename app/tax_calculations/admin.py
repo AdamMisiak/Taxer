@@ -12,7 +12,7 @@ class AssetTaxCalculationAdmin(admin.ModelAdmin):
         "id",
         "opening_transaction",
         "closing_transaction",
-        "tax",
+        "colored_tax",
         "revenue",
         "cost",
         "profit_or_loss",
