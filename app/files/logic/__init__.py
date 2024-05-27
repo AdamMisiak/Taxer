@@ -1,2 +1,3 @@
 from .ib_lynx_report_file import save_data_ib_lynx_report_file
+from .dif_report_file import save_data_dif_report_file
 from .currency_rate_file import save_data_currency_rate_file

@@ -1,12 +1,13 @@
 from celery import shared_task
 from files.models import ReportFile, CurrencyRateFile
 from django.conf import settings
-from files.logic import save_data_ib_lynx_report_file
+from files.logic import save_data_ib_lynx_report_file, save_data_dif_report_file
 from utils.exceptions import ImportException
 
 broker_name_mapping = {
     settings.INTERACTIVE_BROKERS: save_data_ib_lynx_report_file,
     settings.LYNX: save_data_ib_lynx_report_file,
+    settings.DIF: save_data_dif_report_file,
 }
 
 @shared_task
