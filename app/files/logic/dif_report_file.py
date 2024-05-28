@@ -6,7 +6,7 @@ import csv
 def save_data_dif_report_file(file, report_file_object: ReportFile):
     from transactions.logic2 import save_ib_lynx_asset_transaction, save_ib_lynx_dividend_transaction, save_ib_lynx_withholding_tax_transaction, save_ib_lynx_option_transaction, save_ib_lynx_interest_rate_transaction_object
 
-    csvreader = csv.reader(file)
+    csvreader = csv.reader(file, delimiter=";")
 
     for row in csvreader:
         row_type = row[0]
