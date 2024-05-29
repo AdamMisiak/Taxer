@@ -20,7 +20,7 @@ class AssetTaxCalculationAdmin(admin.ModelAdmin):
     )
     list_filter = ("opening_transaction__asset_type", "closing_transaction__asset_type")
     search_fields = ("closing_transaction__asset_name", "opening_transaction__asset_name")
-    ordering = ("-closing_transaction__executed_at", "tax", "revenue", "profit_or_loss", "cost")
+    ordering = ("-closing_transaction__executed_at", "-opening_transaction__executed_at", "tax", "revenue", "profit_or_loss", "cost")
 
     fieldsets = (
         (

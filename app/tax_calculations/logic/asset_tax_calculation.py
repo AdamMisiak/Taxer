@@ -1,5 +1,5 @@
 from transactions.models import AssetTransaction
-
+from datetime import timedelta
 from utils.choices import TransactionSide
 
 
@@ -7,8 +7,9 @@ def create_asset_tax_calculations(sell_transaction: AssetTransaction):
     from tax_calculations.logic import calculate_tax_single_transaction_same_quantity, calculate_tax_multiple_transactions
 
     print(f"ℹ️  Search for matching transactions for closing transactions: {sell_transaction}")
+    # NOTE "+ timedelta(days=3)" because some transactions are book on Monday next week -> there is first sell and but after that
     matching_buy_transactions = AssetTransaction.objects.filter(
-        asset_name=sell_transaction.asset_name, side=TransactionSide.BUY.value, executed_at__lte=sell_transaction.executed_at
+        asset_name=sell_transaction.asset_name, side=TransactionSide.BUY.value, executed_at__lte=sell_transaction.executed_at + timedelta(days=3) 
     ).order_by("executed_at")
     number_of_matching_buy_transactions = len(matching_buy_transactions)
     print(f"ℹ️  Found {number_of_matching_buy_transactions} matching transaction(s)")
