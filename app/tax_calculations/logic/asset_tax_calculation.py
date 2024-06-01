@@ -31,8 +31,6 @@ def create_asset_tax_calculations(sell_transaction: AssetTransaction):
             )
 
     elif number_of_matching_buy_transactions > 1:
-        # NOTE sprawdzic dla TSLA czy pokrywa sie z google sheet (kolejnosc, daty, ceny itp)
-        # NOTE if save transaction 2 times, it's going to calculate tax 2 times
         calculate_tax_multiple_transactions(
             matching_opening_transactions=matching_buy_transactions, closing_transaction=sell_transaction
         )

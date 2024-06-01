@@ -136,5 +136,4 @@ def calculate_tax_multiple_transactions(matching_opening_transactions: QuerySet[
             print(f"ℹ️  Transaction: {opening_transaction} was already used in the calculations!")
 
         else:
-            # NOTE temp
-            print(f"❌ Transaction: {opening_transaction} has not been handled!")
+            print(f"❌ Transaction: {opening_transaction} has not matching opening transactions!")
