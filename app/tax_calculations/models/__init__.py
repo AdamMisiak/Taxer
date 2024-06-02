@@ -1,2 +1,3 @@
 from .base_tax_calculation import BaseTaxCalculation
 from .asset_tax_calculation import AssetTaxCalculation
+from .dividend_tax_calculation import DividendTaxCalculation
