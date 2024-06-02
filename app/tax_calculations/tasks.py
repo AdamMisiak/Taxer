@@ -3,7 +3,7 @@ from files.models import ReportFile, CurrencyRateFile
 from django.conf import settings
 from files.logic import save_data_ib_lynx_report_file
 from tax_calculations.models import AssetTaxCalculation
-from transactions.models import AssetTransaction
+from transactions.models import AssetTransaction, DividendTransaction
 from utils.exceptions import ImportException
 from utils.choices import TransactionSide
 from tax_calculations.logic import create_asset_tax_calculations
@@ -22,4 +22,10 @@ def create_tax_calculations():
     sell_transactions_without_calculations = AssetTransaction.objects.filter(side=TransactionSide.SELL.value, as_closing_calculation__isnull=True).order_by("executed_at")
     for sell_transaction in sell_transactions_without_calculations:
         create_asset_tax_calculations(sell_transaction)
+
+    print('🔼 Dividends: \n')
+    dividend_transactions_without_calculations = DividendTransaction.objects.filter(tax_calculation__isnull=True).order_by("executed_at")
+    for dividend_transaction in dividend_transactions_without_calculations:
+        print(dividend_transaction)
+        # create_asset_tax_calculations(sell_transaction)
 
