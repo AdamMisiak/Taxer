@@ -11,8 +11,8 @@ class InterestRateTransaction(BaseTransaction):
     value_pln = models.FloatField()
 
     class Meta:
-        verbose_name = "Interest Rates transaction"
-        verbose_name_plural = "Interest Rates transactions"
+        verbose_name = "Interest Rates transaction 💸"
+        verbose_name_plural = "Interest Rates transactions 💸"
 
     def __str__(self):
         return f"{InterestRateTransaction.__name__} - {self.asset_name} {self.value} {self.currency} ({self.executed_at.date()})"

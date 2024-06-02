@@ -24,8 +24,8 @@ class AssetTransaction(BaseTransaction):
     full_value_pln = models.FloatField(db_comment="Value of assets including fee in PLN")
 
     class Meta:
-        verbose_name = "Asset transaction"
-        verbose_name_plural = "Asset transactions"
+        verbose_name = "Asset transaction 💸"
+        verbose_name_plural = "Asset transactions 💸"
         unique_together = ("asset_name", "side", "price", "quantity", "executed_at", "raw_data")
 
     def __str__(self):

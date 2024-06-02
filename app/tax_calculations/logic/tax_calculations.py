@@ -125,13 +125,6 @@ def calculate_tax_multiple_transactions(matching_opening_transactions: QuerySet[
             print(f"ℹ️  Summary opening transactions quantity: {summary_opening_transactions_quantity}/{closing_transaction.quantity}")
             calculate_tax_first_of_many_transactions_with_quantity(opening_transaction=opening_transaction, closing_transaction=closing_transaction, quantity=remaining_quantity)
             
-
-            # NOTE check if all transacations are covered + proper checking for 2020-2023 transactions
-            # after adding handling for DIF broker
-            # already checked AMD, AMT, SHLX, WBD, NKE
-
-
-        
         elif opening_transaction.as_opening_calculation.all() and not opening_transaction.as_opening_calculation.last().quantity:
             print(f"ℹ️  Transaction: {opening_transaction} was already used in the calculations!")
 

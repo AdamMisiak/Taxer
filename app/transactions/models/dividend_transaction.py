@@ -11,9 +11,9 @@ class DividendTransaction(BaseTransaction):
     value_pln = models.FloatField()
 
     class Meta:
-        verbose_name = "Dividend transaction"
-        verbose_name_plural = "Dividend transactions"
-        # unique_together = ("asset_name", "value", "currency", "executed_at")
+        verbose_name = "Dividend transaction 💸"
+        verbose_name_plural = "Dividend transactions 💸"
+        unique_together = ("asset_name", "value", "currency", "executed_at", "raw_data")
 
     def __str__(self):
         return f"{DividendTransaction.__name__} - {self.asset_name} {self.value} {self.currency} ({self.executed_at.date()})"

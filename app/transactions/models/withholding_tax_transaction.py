@@ -8,8 +8,8 @@ class WithholdingTaxTransaction(BaseTransaction):
     value_pln = models.FloatField()
 
     class Meta:
-        verbose_name = "Withholding Tax transaction"
-        verbose_name_plural = "Withholding Tax transactions"
+        verbose_name = "Withholding Tax transaction 💸"
+        verbose_name_plural = "Withholding Tax transactions 💸"
         # unique_together = ("asset_name", "value", "currency", "executed_at")
 
     def __str__(self):

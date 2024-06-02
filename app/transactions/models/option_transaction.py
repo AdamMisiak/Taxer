@@ -28,8 +28,8 @@ class OptionTransaction(BaseTransaction):
 
 
     class Meta:
-        verbose_name = "Option transaction"
-        verbose_name_plural = "Option transactions"
+        verbose_name = "Option transaction 💸"
+        verbose_name_plural = "Option transactions 💸"
         unique_together = ("asset_name", "side", "price", "quantity", "executed_at")
 
     def __str__(self):
