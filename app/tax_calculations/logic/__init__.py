@@ -1,2 +1,3 @@
 from .asset_tax_calculation import create_asset_tax_calculations
+from .dividend_tax_calculation import create_dividend_tax_calculations
 from .tax_calculations import calculate_tax_single_transaction_same_quantity, calculate_tax_multiple_transactions
