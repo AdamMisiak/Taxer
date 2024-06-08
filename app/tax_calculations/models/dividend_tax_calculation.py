@@ -23,7 +23,7 @@ class DividendTaxCalculation(BaseTaxCalculation):
         verbose_name_plural = "Dividend tax calculations 🧮"
 
     def __str__(self):
-        return f"{DividendTaxCalculation.__name__} - {self.opening_transaction} <> {self.closing_transaction} Tax: {self.tax} PLN"
+        return f"{DividendTaxCalculation.__name__} - {self.dividend_transaction} <> {self.withholding_tax_transaction} Tax: {self.tax} PLN"
     
     def save(self, *args, **kwargs):
 
