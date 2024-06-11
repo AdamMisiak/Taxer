@@ -15,7 +15,7 @@ def create_asset_tax_calculations(sell_transaction: AssetTransaction):
     print(f"ℹ️  Found {number_of_matching_buy_transactions} matching transaction(s)")
 
     if number_of_matching_buy_transactions == 0:
-        print("❌ No transactions found.")
+        print("❌ No transactions found")
         return
     
     print(f"ℹ️  Found transaction(s): {matching_buy_transactions}\n")

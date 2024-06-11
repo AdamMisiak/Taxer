@@ -18,10 +18,7 @@ def create_dividend_tax_calculations(dividend_transaction: DividendTransaction):
         withholding_tax_pln = round(withholding_tax_transaction.value_pln, 2)
         dividend_net = round(dividend_pln - withholding_tax_pln, 2)
 
-        print(asset_name)
         tax_rate = settings.CUSTOM_DIVIDEND_RATES.get(asset_name, settings.TAX_RATE)
-        print(tax_rate)
-
         tax_to_pay_from_dividend = round((dividend_pln * tax_rate) - withholding_tax_pln, 2)
 
         # init_tax_summary(tax_year)
@@ -36,3 +33,5 @@ def create_dividend_tax_calculations(dividend_transaction: DividendTransaction):
             tax=tax_to_pay_from_dividend,
             tax_rate=tax_rate,
         )
+    else:
+        print(f"❌ Withholding tax transaction is missing for {dividend_transaction}")
