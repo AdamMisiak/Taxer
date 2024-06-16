@@ -18,6 +18,7 @@ ASSET_TYPE_CHOICES = [
     ("Forex", "Forex"),
     ("Dividends", "Dividends"),
     ("Withholding Tax", "Withholding Tax"),
+    ("Others", "Others"),
 ]
 
 CURRENCY_CHOCIES = [
@@ -48,7 +49,9 @@ class Transaction(models.Model):
     price = models.FloatField(null=True, blank=True)
     quantity = models.FloatField(null=True, blank=True)
     value = models.FloatField()
+    full_value = models.FloatField(null=True, blank=True)
     value_pln = models.FloatField()
+    full_value_pln = models.FloatField(null=True, blank=True)
     currency = models.CharField(max_length=3, choices=CURRENCY_CHOCIES)
     previous_day_currency_rate = models.ForeignKey(CurrencyRate, related_name="transactions", on_delete=models.RESTRICT, blank=True, null=True)
     fee = models.FloatField(null=True, blank=True)
@@ -74,7 +77,7 @@ class Transaction(models.Model):
         return format_html(f'<span style="color: #{color_code};">{self.side}</span>')
 
     def __str__(self):
-        if self.asset_type in ["Dividends", "Withholding Tax"]:
+        if self.asset_type in ["Dividends", "Withholding Tax", "Others"]:
             return (
                 f"{self.asset_name} {self.value} {self.currency} - {self.executed_at}"
             )

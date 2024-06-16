@@ -19,6 +19,7 @@ class OptionTransaction(BaseTransaction):
 
     option_type = models.CharField(max_length=4, choices=OptionType.choices, blank=True)
     strike_price = models.FloatField(null=True, blank=True)
+    expired = models.BooleanField(default=False)
 
     value = models.FloatField()
     full_value = models.FloatField(db_comment="Value of assets including fee")
@@ -33,7 +34,7 @@ class OptionTransaction(BaseTransaction):
         unique_together = ("asset_name", "side", "price", "quantity", "executed_at")
 
     def __str__(self):
-        return f"{OptionTransaction.__name__} - {self.side} {self.option_type} {self.quantity} {self.asset_name} @ {self.price} {self.currency} ({self.executed_at.date()})"
+        return f"{OptionTransaction.__name__} - {self.side} {self.option_type} {self.quantity} {self.asset_name} @ {self.price} {self.currency}{' (Expired)' if self.expired else ''} ({self.executed_at.date()})"
 
     def save(self, *args, **kwargs):
         self.asset_type = AssetType.OPTIONS.value
