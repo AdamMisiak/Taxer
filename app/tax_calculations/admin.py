@@ -1,5 +1,5 @@
 from django.contrib import admin
-from tax_calculations.models import AssetTaxCalculation, DividendTaxCalculation
+from tax_calculations.models import AssetTaxCalculation, DividendTaxCalculation, OptionTaxCalculation
 
 BASE_INFO = "Base info"
 OTHER_INFO = "Other info"
@@ -93,5 +93,45 @@ class DividendTaxCalculationAdmin(admin.ModelAdmin):
         )
     )
 
+class OptionTaxCalculationAdmin(admin.ModelAdmin):
+    date_hierarchy = "closing_transaction__executed_at"
+    list_display = (
+        "id",
+        "opening_transaction",
+        "closing_transaction",
+        "colored_tax",
+        "revenue",
+        "cost",
+        "profit_or_loss",
+    )
+    list_filter = ("opening_transaction__asset_type", "closing_transaction__asset_type")
+    search_fields = ("closing_transaction__asset_name", "opening_transaction__asset_name")
+    ordering = ("-closing_transaction__executed_at", "-opening_transaction__executed_at", "tax", "revenue", "profit_or_loss", "cost")
+
+    fieldsets = (
+        (
+            RELATIONS,
+            {
+                "fields": (
+                    "opening_transaction",
+                    "closing_transaction",
+                )
+            },
+        ),
+        (
+            BASE_INFO,
+            {
+                "fields": (
+                    "cost",
+                    "revenue",
+                    "profit_or_loss",
+                    "tax_rate",
+                    "tax",
+                )
+            },
+        ),
+    )
+
 admin.site.register(AssetTaxCalculation, AssetTaxCalculationAdmin)
 admin.site.register(DividendTaxCalculation, DividendTaxCalculationAdmin)
+admin.site.register(OptionTaxCalculation, OptionTaxCalculationAdmin)

@@ -21,6 +21,7 @@ def save_ib_lynx_option_transaction(row: list[str], report_file_object: ReportFi
     currency_index = 4
     fee_index = 11
     executed_at_index = 6
+    tags_index = -1
 
     executed_at = datetime.strptime(row[executed_at_index], "%Y-%m-%d, %H:%M:%S") + timedelta(hours=6)
     previous_day_currency_rate = get_previous_day_curreny_rate(executed_at)
@@ -43,6 +44,7 @@ def save_ib_lynx_option_transaction(row: list[str], report_file_object: ReportFi
     price = round(float(row[price_index]), 2)
     fee = abs(float(row[fee_index]))
     quantity = abs(quantity_raw)
+    expired = price == 0.0 and "Ep" in row[tags_index]
 
     value = round(abs(float(row[value_index])), 2)
     full_value = round(value + fee, 2) if side == "Buy" else round(value - fee, 2)
@@ -61,6 +63,7 @@ def save_ib_lynx_option_transaction(row: list[str], report_file_object: ReportFi
         quantity=quantity,
         option_type=_get_option_type(asset_name),
         strike_price=_get_strike_price(asset_name),
+        expired=expired,
         executed_at=executed_at,
         raw_data=str(row),
         defaults={
