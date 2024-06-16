@@ -159,6 +159,7 @@ class OptionTransactionAdmin(admin.ModelAdmin):
     list_display = (
         "asset_name",
         "colored_side",
+        "expired",
         "asset_type",
         "option_type",
         "price",
@@ -218,6 +219,7 @@ class OptionTransactionAdmin(admin.ModelAdmin):
                 "fields": (
                     "strike_price",
                     "option_type",
+                    "expired",
                 )
             },
         )
