@@ -1,8 +1,9 @@
 from django.conf import settings
-from transactions.models import BaseTransaction
-from tax_calculations.models import AssetTaxCalculation
+from transactions.models import BaseTransaction, OptionTransaction
+from tax_calculations.models import AssetTaxCalculation, OptionTaxCalculation
 from django.db.models import QuerySet
 
+# Assets
 def calculate_tax_single_transaction_same_quantity(opening_transaction: BaseTransaction, closing_transaction: BaseTransaction):
     tax_year = closing_transaction.executed_at.year or opening_transaction.executed_at.year
     profit_or_loss = round(closing_transaction.full_value_pln - opening_transaction.full_value_pln, 2)
@@ -130,3 +131,22 @@ def calculate_tax_multiple_transactions(matching_opening_transactions: QuerySet[
 
         else:
             print(f"❌ Transaction: {opening_transaction} has not matching opening transactions!")
+
+# Options
+
+def calculate_tax_single_transaction_same_quantity_options(opening_transaction: OptionTransaction, closing_transaction: OptionTransaction):
+    tax_year = closing_transaction.executed_at.year or opening_transaction.executed_at.year
+    profit_or_loss = round(opening_transaction.full_value_pln - closing_transaction.full_value_pln, 2)
+    tax_to_pay_from_transaction = round(profit_or_loss * settings.TAX_RATE, 2)
+
+    # NOTE is some needed check which transactions should be used for opening and closing?
+    # depending on the BUY and SELL of the option?
+    OptionTaxCalculation.objects.get_or_create(
+        # tax_summary=TaxSummary.objects.get(year=tax_year),
+        opening_transaction=opening_transaction,
+        closing_transaction=closing_transaction,
+        revenue=opening_transaction.full_value_pln,
+        cost=closing_transaction.full_value_pln,
+        profit_or_loss=profit_or_loss,
+        tax=tax_to_pay_from_transaction,
+    )

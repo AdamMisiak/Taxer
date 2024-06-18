@@ -6,25 +6,29 @@ from utils.choices import TransactionSide
 
 
 def create_option_tax_calculations(closing_transaction: OptionTransaction):
+    from tax_calculations.logic import calculate_tax_single_transaction_same_quantity_options
+
     # NOTE what if there is buy transaction with quantity 2 and sell with quantity 1 and then another with quant 1
 
     print(f"ℹ️  Search for matching transactions for the transactions: {closing_transaction}")
     opposite_side = TransactionSide.SELL.value if closing_transaction.side == TransactionSide.BUY.value else TransactionSide.BUY.value
     
-    matching_buy_transactions = OptionTransaction.objects.filter(side=opposite_side, strike_price=closing_transaction.strike_price, option_type=closing_transaction.option_type, executed_at__lte=closing_transaction.executed_at, as_closing_calculation__isnull=True, as_opening_calculation__isnull=True).order_by("executed_at")
-    number_of_matching_buy_transactions = len(matching_buy_transactions)
-    print(f"ℹ️  Found {number_of_matching_buy_transactions} matching transaction(s)")
+    matching_opening_transactions = OptionTransaction.objects.filter(asset_name=closing_transaction.asset_name, side=opposite_side, strike_price=closing_transaction.strike_price, option_type=closing_transaction.option_type, executed_at__lte=closing_transaction.executed_at, as_closing_calculation__isnull=True, as_opening_calculation__isnull=True).order_by("executed_at")
+    number_of_matching_opening_transactions = len(matching_opening_transactions)
+    print(f"ℹ️  Found {number_of_matching_opening_transactions} matching transaction(s)")
 
-    if number_of_matching_buy_transactions == 0:
+    if number_of_matching_opening_transactions == 0:
         print("❌ No transactions found")
         return
     
-    print(f"ℹ️  Found transaction(s): {matching_buy_transactions}\n")
+    print(f"ℹ️  Found transaction(s): {matching_opening_transactions}\n")
 
-    if number_of_matching_buy_transactions == 1:
-        opening_transaction = matching_buy_transactions.first()
+    if number_of_matching_opening_transactions == 1:
+        opening_transaction = matching_opening_transactions.first()
+        print(f"ℹ️  Used {opening_transaction} transaction for the calculation")
         print(closing_transaction)
         print(opening_transaction)
+        calculate_tax_single_transaction_same_quantity_options(opening_transaction, closing_transaction)
 
     print('--------')
     # withholding_tax_transaction = dividend_transaction.withholding_tax_transaction
