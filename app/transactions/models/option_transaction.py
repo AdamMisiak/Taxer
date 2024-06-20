@@ -17,6 +17,7 @@ class OptionTransaction(BaseTransaction):
     fee = models.FloatField()
     quantity = models.FloatField()
 
+    base_instrument = models.CharField(max_length=10)
     option_type = models.CharField(max_length=4, choices=OptionType.choices, blank=True)
     strike_price = models.FloatField(null=True, blank=True)
     expired = models.BooleanField(default=False)

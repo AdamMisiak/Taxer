@@ -13,7 +13,7 @@ def create_option_tax_calculations(closing_transaction: OptionTransaction):
     print(f"ℹ️  Search for matching transactions for the transactions: {closing_transaction}")
     opposite_side = TransactionSide.SELL.value if closing_transaction.side == TransactionSide.BUY.value else TransactionSide.BUY.value
     
-    matching_opening_transactions = OptionTransaction.objects.filter(asset_name=closing_transaction.asset_name, side=opposite_side, strike_price=closing_transaction.strike_price, option_type=closing_transaction.option_type, executed_at__lte=closing_transaction.executed_at, as_closing_calculation__isnull=True, as_opening_calculation__isnull=True).order_by("executed_at")
+    matching_opening_transactions = OptionTransaction.objects.filter(base_instrument=closing_transaction.base_instrument, side=opposite_side, strike_price=closing_transaction.strike_price, option_type=closing_transaction.option_type, executed_at__lte=closing_transaction.executed_at, as_closing_calculation__isnull=True, as_opening_calculation__isnull=True).order_by("executed_at")
     number_of_matching_opening_transactions = len(matching_opening_transactions)
     print(f"ℹ️  Found {number_of_matching_opening_transactions} matching transaction(s)")
 
@@ -31,6 +31,10 @@ def create_option_tax_calculations(closing_transaction: OptionTransaction):
         calculate_tax_single_transaction_same_quantity_options(opening_transaction, closing_transaction)
 
     print('--------')
+
+
+    # NOTE add closing trans and opening trans inlines to all admin panels (transaction)
+
     # withholding_tax_transaction = dividend_transaction.withholding_tax_transaction
     # if withholding_tax_transaction:
 

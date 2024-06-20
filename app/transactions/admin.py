@@ -217,6 +217,7 @@ class OptionTransactionAdmin(admin.ModelAdmin):
             OPTION_INFO,
             {
                 "fields": (
+                    "base_instrument",
                     "strike_price",
                     "option_type",
                     "expired",
