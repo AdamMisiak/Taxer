@@ -33,7 +33,6 @@ def create_option_tax_calculations(closing_transaction: OptionTransaction):
     print('--------')
 
 
-    # NOTE add closing trans and opening trans inlines to all admin panels (transaction)
 
     # withholding_tax_transaction = dividend_transaction.withholding_tax_transaction
     # if withholding_tax_transaction:

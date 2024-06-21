@@ -1,6 +1,6 @@
 from django.contrib import admin
 from transactions.models import CurrencyRate, WithholdingTax, ImportFile, InterestRateTransaction, TaxCalculation, TaxSummary, Transaction, OptionTransaction, BaseTransaction, AssetTransaction, DividendTransaction, WithholdingTaxTransaction
-from tax_calculations.models import AssetTaxCalculation
+from tax_calculations.models import AssetTaxCalculation, OptionTaxCalculation
 
 BASE_INFO = "Base info"
 OTHER_INFO = "Other info"
@@ -154,6 +154,19 @@ class AssetTransactionAdmin(admin.ModelAdmin):
         )
     )
 
+class OptionTaxCalculationOpeningInline(admin.StackedInline):
+    verbose_name_plural = "As Closing Tax Calculations"
+    model = OptionTaxCalculation
+    fk_name = "closing_transaction"
+    extra = 0
+
+
+class OptionTaxCalculationClosingInline(admin.StackedInline):
+    verbose_name_plural = "As Opening Tax Calculations"
+    model = OptionTaxCalculation
+    fk_name = "opening_transaction"
+    extra = 0
+
 class OptionTransactionAdmin(admin.ModelAdmin):
     date_hierarchy = "executed_at"
     list_display = (
@@ -174,6 +187,10 @@ class OptionTransactionAdmin(admin.ModelAdmin):
     list_filter = ("side", "asset_type", "option_type", "currency", "executed_at")
     search_fields = ("asset_name", "asset_type", "option_type")
     ordering = ("-executed_at", "asset_name", "fee", "quantity", "value", "value_pln")
+    inlines = [
+        OptionTaxCalculationOpeningInline,
+        OptionTaxCalculationClosingInline,
+    ]
 
     fieldsets = (
         (
@@ -267,7 +284,6 @@ class DividendTransactionAdmin(admin.ModelAdmin):
             DIVIDEND_INFO,
             {
                 "fields": (
-                    # "withholding_tax_transaction",
                     "value",
                     "value_per_share",
                     "value_pln",
@@ -276,7 +292,6 @@ class DividendTransactionAdmin(admin.ModelAdmin):
         )
     )
 
-# NOTE add nested dividend model here? (inline)
 class WithholdingTaxTransactionAdmin(admin.ModelAdmin):
     date_hierarchy = "executed_at"
     list_display = (

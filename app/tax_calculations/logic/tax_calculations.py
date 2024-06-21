@@ -133,7 +133,6 @@ def calculate_tax_multiple_transactions(matching_opening_transactions: QuerySet[
             print(f"❌ Transaction: {opening_transaction} has not matching opening transactions!")
 
 # Options
-
 def calculate_tax_single_transaction_same_quantity_options(opening_transaction: OptionTransaction, closing_transaction: OptionTransaction):
     tax_year = closing_transaction.executed_at.year or opening_transaction.executed_at.year
     profit_or_loss = round(opening_transaction.full_value_pln - closing_transaction.full_value_pln, 2)
