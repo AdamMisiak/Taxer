@@ -48,7 +48,7 @@ def save_ib_lynx_option_transaction(row: list[str], report_file_object: ReportFi
     price = round(float(row[price_index]), 2)
     fee = abs(float(row[fee_index]))
     quantity = abs(quantity_raw)
-    expired = price == 0.0 and "Ep" in row[tags_index]
+    expired = price == 0.0 and row[tags_index] in ["A;C", "C;Ep"]
 
     value = round(abs(float(row[value_index])), 2)
     full_value = round(value + fee, 2) if side == "Buy" else round(value - fee, 2)

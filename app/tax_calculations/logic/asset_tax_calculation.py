@@ -1,4 +1,5 @@
 from transactions.models import AssetTransaction
+from tax_calculations.models import AssetTaxCalculation
 from datetime import timedelta
 from utils.choices import TransactionSide
 
@@ -32,5 +33,5 @@ def create_asset_tax_calculations(sell_transaction: AssetTransaction):
 
     elif number_of_matching_buy_transactions > 1:
         calculate_tax_multiple_transactions(
-            matching_opening_transactions=matching_buy_transactions, closing_transaction=sell_transaction
+            model=AssetTaxCalculation, matching_opening_transactions=matching_buy_transactions, closing_transaction=sell_transaction
         )

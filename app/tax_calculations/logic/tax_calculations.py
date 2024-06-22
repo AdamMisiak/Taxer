@@ -4,12 +4,12 @@ from tax_calculations.models import AssetTaxCalculation, OptionTaxCalculation
 from django.db.models import QuerySet
 
 # Assets
-def calculate_tax_single_transaction_same_quantity(opening_transaction: BaseTransaction, closing_transaction: BaseTransaction):
+def calculate_tax_single_transaction_same_quantity(model: BaseTransaction, opening_transaction: BaseTransaction, closing_transaction: BaseTransaction):
     tax_year = closing_transaction.executed_at.year or opening_transaction.executed_at.year
     profit_or_loss = round(closing_transaction.full_value_pln - opening_transaction.full_value_pln, 2)
     tax_to_pay_from_transaction = round(profit_or_loss * settings.TAX_RATE, 2)
 
-    AssetTaxCalculation.objects.get_or_create(
+    model.objects.get_or_create(
         # tax_summary=TaxSummary.objects.get(year=tax_year),
         opening_transaction=opening_transaction,
         closing_transaction=closing_transaction,
@@ -21,13 +21,13 @@ def calculate_tax_single_transaction_same_quantity(opening_transaction: BaseTran
 
 # NOTE think about the name? "same" quantity?
 def calculate_tax_multiple_transactions_same_quantity(
-    opening_transaction: BaseTransaction, closing_transaction: BaseTransaction, quantity: int = None
+    model: BaseTransaction, opening_transaction: BaseTransaction, closing_transaction: BaseTransaction, quantity: int = None
 ):
     revenue = 0
     cost = opening_transaction.full_value_pln
     profit_or_loss = round(revenue - cost, 2)
     tax_to_pay_from_transaction = round(profit_or_loss * settings.TAX_RATE, 2)
-    AssetTaxCalculation.objects.get_or_create(
+    model.objects.get_or_create(
         # tax_summary=TaxSummary.objects.get(year=tax_year),
         opening_transaction=opening_transaction,
         closing_transaction=closing_transaction,
@@ -38,7 +38,7 @@ def calculate_tax_multiple_transactions_same_quantity(
     )
 
 def calculate_tax_multiple_transactions_different_quantity(
-    opening_transaction: BaseTransaction, closing_transaction: BaseTransaction, quantity: int = None
+    model: BaseTransaction, opening_transaction: BaseTransaction, closing_transaction: BaseTransaction, quantity: int = None
 ):
     ratio = quantity / opening_transaction.quantity
     # tax_year = closing_transaction.executed_at.year or opening_transaction.executed_at.year
@@ -48,7 +48,7 @@ def calculate_tax_multiple_transactions_different_quantity(
     profit_or_loss = round(revenue - cost, 2)
     tax_to_pay_from_transaction = round(profit_or_loss * settings.TAX_RATE, 2)
 
-    AssetTaxCalculation.objects.get_or_create(
+    model.objects.get_or_create(
         # tax_summary=TaxSummary.objects.get(year=tax_year),
         opening_transaction=opening_transaction,
         closing_transaction=closing_transaction,
@@ -60,7 +60,7 @@ def calculate_tax_multiple_transactions_different_quantity(
     )
 
 def calculate_tax_first_of_many_transactions_with_quantity(
-    opening_transaction: BaseTransaction, closing_transaction: BaseTransaction, quantity: int = None
+    model: BaseTransaction, opening_transaction: BaseTransaction, closing_transaction: BaseTransaction, quantity: int = None
 ):
     ratio = quantity / opening_transaction.quantity
     # tax_year = closing_transaction.executed_at.year or opening_transaction.executed_at.year
@@ -70,7 +70,7 @@ def calculate_tax_first_of_many_transactions_with_quantity(
     profit_or_loss = round(revenue - cost, 2)
     tax_to_pay_from_transaction = round(profit_or_loss * settings.TAX_RATE, 2)
 
-    AssetTaxCalculation.objects.get_or_create(
+    model.objects.get_or_create(
         # tax_summary=TaxSummary.objects.get(year=tax_year),
         opening_transaction=opening_transaction,
         closing_transaction=closing_transaction,
@@ -81,7 +81,7 @@ def calculate_tax_first_of_many_transactions_with_quantity(
         quantity=quantity,
     )
 
-def calculate_tax_multiple_transactions(matching_opening_transactions: QuerySet[BaseTransaction], closing_transaction: BaseTransaction):
+def calculate_tax_multiple_transactions(model: BaseTransaction, matching_opening_transactions: QuerySet[BaseTransaction], closing_transaction: BaseTransaction):
     summary_opening_transactions_quantity = 0
 
     for opening_transaction in matching_opening_transactions:
@@ -93,7 +93,7 @@ def calculate_tax_multiple_transactions(matching_opening_transactions: QuerySet[
         ):
             print(f"ℹ️  Used full transaction with matching quantity: {opening_transaction}")
             calculate_tax_single_transaction_same_quantity(
-                opening_transaction=opening_transaction, closing_transaction=closing_transaction
+                model=model, opening_transaction=opening_transaction, closing_transaction=closing_transaction
             )
             break
 
@@ -102,14 +102,14 @@ def calculate_tax_multiple_transactions(matching_opening_transactions: QuerySet[
                 summary_opening_transactions_quantity += opening_transaction.quantity
                 print(f"ℹ️  Used (partial) middle transaction with smaller quantity: {opening_transaction}")
                 print(f"ℹ️  Summary opening transactions quantity: {summary_opening_transactions_quantity}/{closing_transaction.quantity}")
-                calculate_tax_multiple_transactions_same_quantity(opening_transaction=opening_transaction, closing_transaction=closing_transaction)
+                calculate_tax_multiple_transactions_same_quantity(model=model, opening_transaction=opening_transaction, closing_transaction=closing_transaction)
             
             elif summary_opening_transactions_quantity + opening_transaction.quantity == closing_transaction.quantity:
                 summary_opening_transactions_quantity += opening_transaction.quantity
                 print(f"ℹ️  Used (partial) last transaction with matching quantity: {opening_transaction}")
                 print(f"ℹ️  Summary opening transactions quantity: {summary_opening_transactions_quantity}/{closing_transaction.quantity}")
                 calculate_tax_single_transaction_same_quantity(
-                    opening_transaction=opening_transaction, closing_transaction=closing_transaction
+                    model=model, opening_transaction=opening_transaction, closing_transaction=closing_transaction
                 )
             
             elif summary_opening_transactions_quantity < closing_transaction.quantity and summary_opening_transactions_quantity + opening_transaction.quantity > closing_transaction.quantity:
@@ -117,14 +117,14 @@ def calculate_tax_multiple_transactions(matching_opening_transactions: QuerySet[
                 summary_opening_transactions_quantity += remaining_quantity
                 print(f"ℹ️  Used (partial) last transaction with smaller quantity: {opening_transaction}")
                 print(f"ℹ️  Summary opening transactions quantity: {summary_opening_transactions_quantity}/{closing_transaction.quantity}")
-                calculate_tax_multiple_transactions_different_quantity(opening_transaction=opening_transaction, closing_transaction=closing_transaction, quantity=remaining_quantity)
+                calculate_tax_multiple_transactions_different_quantity(model=model, opening_transaction=opening_transaction, closing_transaction=closing_transaction, quantity=remaining_quantity)
 
         elif opening_transaction.quantity <= closing_transaction.quantity and opening_transaction.as_opening_calculation.all() and opening_transaction.as_opening_calculation.last().quantity:
             remaining_quantity = opening_transaction.quantity - opening_transaction.as_opening_calculation.last().quantity
             summary_opening_transactions_quantity += remaining_quantity
             print(f"ℹ️  Used (partial) first? transaction with smaller quantity: {opening_transaction}")
             print(f"ℹ️  Summary opening transactions quantity: {summary_opening_transactions_quantity}/{closing_transaction.quantity}")
-            calculate_tax_first_of_many_transactions_with_quantity(opening_transaction=opening_transaction, closing_transaction=closing_transaction, quantity=remaining_quantity)
+            calculate_tax_first_of_many_transactions_with_quantity(model=model, opening_transaction=opening_transaction, closing_transaction=closing_transaction, quantity=remaining_quantity)
             
         elif opening_transaction.as_opening_calculation.all() and not opening_transaction.as_opening_calculation.last().quantity:
             print(f"ℹ️  Transaction: {opening_transaction} was already used in the calculations!")
@@ -133,6 +133,7 @@ def calculate_tax_multiple_transactions(matching_opening_transactions: QuerySet[
             print(f"❌ Transaction: {opening_transaction} has not matching opening transactions!")
 
 # Options
+# Is it needed when fucntions above are generic?
 def calculate_tax_single_transaction_same_quantity_options(opening_transaction: OptionTransaction, closing_transaction: OptionTransaction):
     tax_year = closing_transaction.executed_at.year or opening_transaction.executed_at.year
     profit_or_loss = round(opening_transaction.full_value_pln - closing_transaction.full_value_pln, 2)

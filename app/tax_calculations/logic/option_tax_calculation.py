@@ -6,14 +6,24 @@ from utils.choices import TransactionSide
 
 
 def create_option_tax_calculations(closing_transaction: OptionTransaction):
-    from tax_calculations.logic import calculate_tax_single_transaction_same_quantity_options
+    from tax_calculations.logic import calculate_tax_single_transaction_same_quantity_options, calculate_tax_multiple_transactions
 
     # NOTE what if there is buy transaction with quantity 2 and sell with quantity 1 and then another with quant 1
 
     print(f"ℹ️  Search for matching transactions for the transactions: {closing_transaction}")
     opposite_side = TransactionSide.SELL.value if closing_transaction.side == TransactionSide.BUY.value else TransactionSide.BUY.value
     
-    matching_opening_transactions = OptionTransaction.objects.filter(base_instrument=closing_transaction.base_instrument, side=opposite_side, strike_price=closing_transaction.strike_price, option_type=closing_transaction.option_type, executed_at__lte=closing_transaction.executed_at, as_closing_calculation__isnull=True, as_opening_calculation__isnull=True).order_by("executed_at")
+    matching_opening_transactions = OptionTransaction.objects.filter(
+        base_instrument=closing_transaction.base_instrument,
+        # added this because there are 377.0 prices AND 377 prices
+        expired_at=closing_transaction.expired_at,
+        strike_price=closing_transaction.strike_price,
+        option_type=closing_transaction.option_type,
+        side=opposite_side,
+        executed_at__lte=closing_transaction.executed_at,
+        as_closing_calculation__isnull=True,
+        as_opening_calculation__isnull=True
+    ).order_by("executed_at")
     number_of_matching_opening_transactions = len(matching_opening_transactions)
     print(f"ℹ️  Found {number_of_matching_opening_transactions} matching transaction(s)")
 
@@ -29,7 +39,16 @@ def create_option_tax_calculations(closing_transaction: OptionTransaction):
         print(closing_transaction)
         print(opening_transaction)
         calculate_tax_single_transaction_same_quantity_options(opening_transaction, closing_transaction)
+    
 
+    # NOTE add expired_at field to optionTramsaction
+    # NOTE partial transactions for AMT are wrong - check that!!
+
+
+    elif number_of_matching_opening_transactions > 1:
+        calculate_tax_multiple_transactions(
+            model=OptionTaxCalculation, matching_opening_transactions=matching_opening_transactions, closing_transaction=closing_transaction
+        )
     print('--------')
 
 
