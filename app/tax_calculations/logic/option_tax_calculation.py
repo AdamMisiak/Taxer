@@ -16,7 +16,7 @@ def create_option_tax_calculations(closing_transaction: OptionTransaction):
     matching_opening_transactions = OptionTransaction.objects.filter(
         base_instrument=closing_transaction.base_instrument,
         # added this because there are 377.0 prices AND 377 prices
-        expired_at=closing_transaction.expired_at,
+        expiration_date=closing_transaction.expiration_date,
         strike_price=closing_transaction.strike_price,
         option_type=closing_transaction.option_type,
         side=opposite_side,
@@ -41,8 +41,12 @@ def create_option_tax_calculations(closing_transaction: OptionTransaction):
         calculate_tax_single_transaction_same_quantity_options(opening_transaction, closing_transaction)
     
 
-    # NOTE add expired_at field to optionTramsaction
+
     # NOTE partial transactions for AMT are wrong - check that!!
+    # MPW 24MAR23 also not working -> quantity not icnluded -> connected 1.0 BUY with 2.0 SELL
+
+    # after this -> check if this query above is working fine with expiration_date condition
+
 
 
     elif number_of_matching_opening_transactions > 1:

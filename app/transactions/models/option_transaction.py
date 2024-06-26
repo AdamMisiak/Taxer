@@ -20,6 +20,7 @@ class OptionTransaction(BaseTransaction):
     base_instrument = models.CharField(max_length=10)
     option_type = models.CharField(max_length=4, choices=OptionType.choices, blank=True)
     strike_price = models.FloatField(null=True, blank=True)
+    expiration_date = models.DateField()
     expired = models.BooleanField(default=False)
 
     value = models.FloatField()

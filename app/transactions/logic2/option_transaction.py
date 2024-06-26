@@ -16,6 +16,10 @@ def _get_strike_price(option_name: str) -> float:
     # NOTE Change with REGEX?
     return float(option_name.split()[-2])
 
+def _get_expiration_date(option_name: str) -> float:
+    # NOTE Change with REGEX?
+    return datetime.strptime(option_name.split()[1], "%d%b%y")
+
 def save_ib_lynx_option_transaction(row: list[str], report_file_object: ReportFile):
     asset_name_index = 5
     asset_type_index = 3
@@ -68,6 +72,7 @@ def save_ib_lynx_option_transaction(row: list[str], report_file_object: ReportFi
         base_instrument=_get_base_instrument(asset_name),
         option_type=_get_option_type(asset_name),
         strike_price=_get_strike_price(asset_name),
+        expiration_date=_get_expiration_date(asset_name),
         expired=expired,
         executed_at=executed_at,
         raw_data=str(row),
