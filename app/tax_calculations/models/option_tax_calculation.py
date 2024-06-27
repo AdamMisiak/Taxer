@@ -15,6 +15,8 @@ class OptionTaxCalculation(BaseTaxCalculation):
         related_name="as_closing_calculation",
         on_delete=models.CASCADE,
     )
+    
+    quantity = models.FloatField(blank=True, null=True)
 
     class Meta:
         verbose_name = "Option tax calculation 🧮"

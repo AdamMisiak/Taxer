@@ -220,6 +220,7 @@ class OptionTransactionAdmin(admin.ModelAdmin):
             {
                 "fields": (
                     "side",
+                    "closing",
                     "price",
                     "fee",
                     "quantity",
@@ -235,8 +236,9 @@ class OptionTransactionAdmin(admin.ModelAdmin):
             {
                 "fields": (
                     "base_instrument",
-                    "strike_price",
                     "option_type",
+                    "strike_price",
+                    "expiration_date",
                     "expired",
                 )
             },

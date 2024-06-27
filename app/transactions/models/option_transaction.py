@@ -12,6 +12,7 @@ from transactions.models import BaseTransaction
 
 class OptionTransaction(BaseTransaction):
     side = models.CharField(max_length=8, choices=TransactionSide.choices, blank=True)
+    closing = models.BooleanField(default=False)
     
     price = models.FloatField()
     fee = models.FloatField()

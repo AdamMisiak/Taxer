@@ -29,6 +29,6 @@ def create_tax_calculations():
         create_dividend_tax_calculations(dividend_transaction)
 
     print('➡️  Options: \n')
-    option_transactions_without_calculations = OptionTransaction.objects.filter(as_closing_calculation__isnull=True, as_opening_calculation__isnull=True).order_by("executed_at")
+    option_transactions_without_calculations = OptionTransaction.objects.filter(closing=True, as_closing_calculation__isnull=True, as_opening_calculation__isnull=True).order_by("executed_at")
     for option_transaction in option_transactions_without_calculations:
         create_option_tax_calculations(option_transaction)

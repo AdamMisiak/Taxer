@@ -15,11 +15,11 @@ def create_option_tax_calculations(closing_transaction: OptionTransaction):
     
     matching_opening_transactions = OptionTransaction.objects.filter(
         base_instrument=closing_transaction.base_instrument,
-        # added this because there are 377.0 prices AND 377 prices
         expiration_date=closing_transaction.expiration_date,
         strike_price=closing_transaction.strike_price,
         option_type=closing_transaction.option_type,
         side=opposite_side,
+        closing=False,
         executed_at__lte=closing_transaction.executed_at,
         as_closing_calculation__isnull=True,
         as_opening_calculation__isnull=True
@@ -35,13 +35,15 @@ def create_option_tax_calculations(closing_transaction: OptionTransaction):
 
     if number_of_matching_opening_transactions == 1:
         opening_transaction = matching_opening_transactions.first()
-        print(f"ℹ️  Used {opening_transaction} transaction for the calculation")
-        print(closing_transaction)
-        print(opening_transaction)
+        # print(f"ℹ️  Used {opening_transaction} transaction for the calculation")
+        # print(closing_transaction)
+        # print(opening_transaction)
+        # NOTE additional check here - if quantities are equal?
         calculate_tax_single_transaction_same_quantity_options(opening_transaction, closing_transaction)
     
 
 
+    # NOTE why it is still shwoing only 1 transaction opening to MPW 24MAR23 - it is taking one BUY (1.0) transaction as closing one
     # NOTE partial transactions for AMT are wrong - check that!!
     # MPW 24MAR23 also not working -> quantity not icnluded -> connected 1.0 BUY with 2.0 SELL
 

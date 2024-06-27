@@ -103,6 +103,7 @@ class OptionTaxCalculationAdmin(admin.ModelAdmin):
         "revenue",
         "cost",
         "profit_or_loss",
+        "quantity",
     )
     # list_filter = ("opening_transaction__asset_type", "closing_transaction__asset_type")
     search_fields = ("closing_transaction__asset_name", "opening_transaction__asset_name")
@@ -130,6 +131,14 @@ class OptionTaxCalculationAdmin(admin.ModelAdmin):
                 )
             },
         ),
+        (
+            OTHER_INFO,
+            {
+                "fields": (
+                    "quantity",
+                )
+            },
+        )
     )
 
 admin.site.register(AssetTaxCalculation, AssetTaxCalculationAdmin)

@@ -4,6 +4,10 @@ from utils.logic import get_previous_day_curreny_rate
 from transactions.models import OptionTransaction
 from utils.choices import TransactionSide, Currency, OptionType
 
+def _get_closing(tags: str) -> bool:
+    # NOTE Change with REGEX?
+    return "C" in tags
+
 def _get_base_instrument(option_name: str) -> str:
     # NOTE Change with REGEX?
     return option_name.split(" ")[0]
@@ -67,6 +71,7 @@ def save_ib_lynx_option_transaction(row: list[str], report_file_object: ReportFi
     OptionTransaction.objects.get_or_create(
         asset_name=asset_name,
         side=side,
+        closing=_get_closing(row[tags_index]),
         price=price,
         quantity=quantity,
         base_instrument=_get_base_instrument(asset_name),
