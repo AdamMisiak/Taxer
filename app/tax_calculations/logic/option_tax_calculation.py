@@ -38,12 +38,17 @@ def create_option_tax_calculations(closing_transaction: OptionTransaction):
         # print(f"ℹ️  Used {opening_transaction} transaction for the calculation")
         # print(closing_transaction)
         # print(opening_transaction)
-        # NOTE additional check here - if quantities are equal?
-        calculate_tax_single_transaction_same_quantity_options(opening_transaction, closing_transaction)
+        # NOTE additional check here - if quantities are equal? 
+        if opening_transaction.quantity == closing_transaction.quantity:
+            calculate_tax_single_transaction_same_quantity_options(opening_transaction, closing_transaction)
+        else:
+            print("Some other handling function here")
+            # NOTE: similar to calculate_tax_multiple_transactions? Or cover only oen use case for now? when two closing transaction are equal
+            # or add this new use case to calculate_tax_multiple_transactions?
     
 
 
-    # NOTE why it is still shwoing only 1 transaction opening to MPW 24MAR23 - it is taking one BUY (1.0) transaction as closing one
+    # NOTE why it is still shwoing only 1 transaction opening to MPW 24MAR23 - it is taking one BUY (1.0 out of 2.0) transaction as closing one and finding opening one as SELL (2.0)
     # NOTE partial transactions for AMT are wrong - check that!!
     # MPW 24MAR23 also not working -> quantity not icnluded -> connected 1.0 BUY with 2.0 SELL
 
