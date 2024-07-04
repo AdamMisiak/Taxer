@@ -30,6 +30,7 @@ def create_asset_tax_calculations(sell_transaction: AssetTransaction):
             calculate_tax_single_transaction_same_quantity(
                 opening_transaction=buy_transaction, closing_transaction=sell_transaction
             )
+        # NOTE add else here? Or another separated complex function 
 
     elif number_of_matching_buy_transactions > 1:
         calculate_tax_multiple_transactions(
