@@ -11,6 +11,10 @@ class TransactionSide(models.TextChoices):
     BUY = "Buy", "Buy"
     SELL = "Sell", "Sell"
 
+class TransactionType(models.TextChoices):
+    OPENING = "Opening", "Opening"
+    CLOSING = "Closing", "Closing"
+
 class Currency(models.TextChoices):
     USD = "USD", "USD"
     EUR = "EUR", "EUR"

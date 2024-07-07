@@ -98,6 +98,7 @@ class AssetTransactionAdmin(admin.ModelAdmin):
     list_display = (
         "asset_name",
         "colored_side",
+        "type",
         "asset_type",
         "price",
         "quantity",
@@ -107,7 +108,7 @@ class AssetTransactionAdmin(admin.ModelAdmin):
         # "fee",
         "executed_at",
     )
-    list_filter = ("side", "asset_type", "currency", "executed_at")
+    list_filter = ("side", "type", "asset_type", "currency", "executed_at")
     search_fields = ("asset_name", "asset_type")
     ordering = ("-executed_at", "asset_name", "fee", "quantity", "value", "value_pln")
     inlines = [
@@ -141,6 +142,7 @@ class AssetTransactionAdmin(admin.ModelAdmin):
             {
                 "fields": (
                     "side",
+                    "type",
                     "price",
                     "fee",
                     "quantity",
@@ -172,6 +174,7 @@ class OptionTransactionAdmin(admin.ModelAdmin):
     list_display = (
         "asset_name",
         "colored_side",
+        "type",
         "expired",
         "asset_type",
         "option_type",
@@ -184,7 +187,7 @@ class OptionTransactionAdmin(admin.ModelAdmin):
         # "fee",
         "executed_at",
     )
-    list_filter = ("side", "asset_type", "option_type", "currency", "executed_at")
+    list_filter = ("side", "type", "asset_type", "option_type", "currency", "executed_at")
     search_fields = ("asset_name", "asset_type", "option_type")
     ordering = ("-executed_at", "asset_name", "fee", "quantity", "value", "value_pln")
     inlines = [
@@ -220,7 +223,7 @@ class OptionTransactionAdmin(admin.ModelAdmin):
             {
                 "fields": (
                     "side",
-                    "closing",
+                    "type",
                     "price",
                     "fee",
                     "quantity",

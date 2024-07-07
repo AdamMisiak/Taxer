@@ -6,13 +6,13 @@ from django.utils.html import format_html
 # from .currency_rate import CurrencyRate
 from .withholding_tax import WithholdingTax
 
-from utils.choices import AssetType, TransactionSide, OptionType
+from utils.choices import AssetType, TransactionSide, OptionType, TransactionType
 from transactions.models import BaseTransaction
 
 
 class OptionTransaction(BaseTransaction):
     side = models.CharField(max_length=8, choices=TransactionSide.choices, blank=True)
-    closing = models.BooleanField(default=False)
+    type = models.CharField(max_length=16, choices=TransactionType.choices, blank=True)
     
     price = models.FloatField()
     fee = models.FloatField()

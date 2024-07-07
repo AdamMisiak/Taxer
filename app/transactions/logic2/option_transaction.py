@@ -2,11 +2,17 @@ from datetime import datetime, timedelta
 from files.models import ReportFile
 from utils.logic import get_previous_day_curreny_rate
 from transactions.models import OptionTransaction
-from utils.choices import TransactionSide, Currency, OptionType
+from utils.choices import TransactionSide, Currency, OptionType, TransactionType
 
-def _get_closing(tags: str) -> bool:
-    # NOTE Change with REGEX?
-    return "C" in tags
+def _get_type(tags: str) -> str:
+    # NOTE is it always C OR O??? Maybe there are some edge cases
+    if "C" in tags:
+        return TransactionType.CLOSING.value
+    elif "O" in tags:
+        return TransactionType.OPENING.value
+    else:
+        raise Exception(f"{tags} can not be handled!!")
+    # return TransactionType.CLOSING.value if "C" in tags else TransactionType.OPENING.value
 
 def _get_base_instrument(option_name: str) -> str:
     # NOTE Change with REGEX?
@@ -71,7 +77,7 @@ def save_ib_lynx_option_transaction(row: list[str], report_file_object: ReportFi
     OptionTransaction.objects.get_or_create(
         asset_name=asset_name,
         side=side,
-        closing=_get_closing(row[tags_index]),
+        type=_get_type(row[tags_index]),
         price=price,
         quantity=quantity,
         base_instrument=_get_base_instrument(asset_name),

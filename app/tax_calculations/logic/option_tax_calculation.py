@@ -29,7 +29,8 @@ def create_option_tax_calculations(closing_transaction: OptionTransaction):
             strike_price=closing_transaction.strike_price,
             option_type=closing_transaction.option_type,
             side=opposite_side,
-            closing=False,
+            # NOTE change it to the `type` field + same for the assets
+            # closing=False,
             executed_at__lte=closing_transaction.executed_at,
             # as_closing_calculation__quantity__isnull=True,
             as_opening_calculation__quantity__isnull=False
@@ -51,6 +52,7 @@ def create_option_tax_calculations(closing_transaction: OptionTransaction):
         else:
             ratio = closing_transaction.quantity / opening_transaction.quantity
             print(f"ℹ️  Used {opening_transaction} transaction with {ratio} ratio for the calculation")
+            # calculate_tax_single_transaction_different_quantity_options(opening_transaction, closing_transaction, ratio)
 
             # tax_year = closing_transaction.executed_at.year or opening_transaction.executed_at.year
             revenue = opening_transaction.full_value_pln*ratio
@@ -74,6 +76,12 @@ def create_option_tax_calculations(closing_transaction: OptionTransaction):
 
 
     # NOTE partial transactions for AMT are wrong - check that!!
+    # AMT 15SEP23 - nie mozna uzyc funkcji z assets bo w options jest odwrotnie -> sell to jest opening trans
+    # revenue w calculate_tax_multiple_transactions_same_quantity nie powinno byc 0
+
+
+    # NOTE add closing and opening field to assets + options models (buy and sell does not mean tha transaction was opened/closed)
+
     # MPW 24MAR23 also not working -> quantity not icnluded -> connected 1.0 BUY with 2.0 SELL
     # MPW 28JUL23 same probably
 
