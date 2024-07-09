@@ -1,7 +1,7 @@
 from transactions.models import OptionTransaction
 from tax_calculations.models import OptionTaxCalculation
 from django.conf import settings
-from utils.choices import TransactionSide
+from utils.choices import TransactionSide, TransactionType
 
 
 def create_option_tax_calculations(closing_transaction: OptionTransaction):
@@ -16,7 +16,7 @@ def create_option_tax_calculations(closing_transaction: OptionTransaction):
         strike_price=closing_transaction.strike_price,
         option_type=closing_transaction.option_type,
         side=opposite_side,
-        closing=False,
+        type=TransactionType.OPENING.value,
         executed_at__lte=closing_transaction.executed_at,
         as_closing_calculation__isnull=True,
         as_opening_calculation__isnull=True
@@ -29,8 +29,7 @@ def create_option_tax_calculations(closing_transaction: OptionTransaction):
             strike_price=closing_transaction.strike_price,
             option_type=closing_transaction.option_type,
             side=opposite_side,
-            # NOTE change it to the `type` field + same for the assets
-            # closing=False,
+            type=TransactionType.OPENING.value,
             executed_at__lte=closing_transaction.executed_at,
             # as_closing_calculation__quantity__isnull=True,
             as_opening_calculation__quantity__isnull=False
@@ -70,9 +69,11 @@ def create_option_tax_calculations(closing_transaction: OptionTransaction):
                 quantity=closing_transaction.quantity,
             )
             # NOTE refactor + split this function into smaller ones -> same as calculate_tax_multiple_transactions for assets
-            # NOTE: similar to calculate_tax_multiple_transactions? Or cover only oen use case for now? when two closing transaction are equal
-            # or add this new use case to calculate_tax_multiple_transactions?
-    
+
+
+
+    # TODO after switch to filtering with type field -> tax calcs data broker
+    # CHECK THAT
 
 
     # NOTE partial transactions for AMT are wrong - check that!!

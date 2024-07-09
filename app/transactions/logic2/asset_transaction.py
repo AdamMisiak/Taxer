@@ -2,8 +2,17 @@ from datetime import datetime, timedelta
 from files.models import ReportFile
 from utils.logic import get_previous_day_curreny_rate
 from transactions.models import AssetTransaction
-from utils.choices import TransactionSide, Currency, AssetType
+from utils.choices import TransactionSide, Currency, AssetType, TransactionType
 
+def _get_type(tags: str) -> str:
+    # NOTE is it always C OR O??? Maybe there are some edge cases
+    if "C" in tags:
+        return TransactionType.CLOSING.value
+    elif "O" in tags:
+        return TransactionType.OPENING.value
+    else:
+        raise Exception(f"{tags} can not be handled!!")
+        
 def save_ib_lynx_asset_transaction(row: list[str], report_file_object: ReportFile):
     asset_name_index = 5
     asset_type_index = 3
@@ -13,6 +22,7 @@ def save_ib_lynx_asset_transaction(row: list[str], report_file_object: ReportFil
     currency_index = 4
     fee_index = 11
     executed_at_index = 6
+    tags_index = -1
 
     executed_at = datetime.strptime(row[executed_at_index], "%Y-%m-%d, %H:%M:%S") + timedelta(hours=6)
     previous_day_currency_rate = get_previous_day_curreny_rate(executed_at)
@@ -48,6 +58,7 @@ def save_ib_lynx_asset_transaction(row: list[str], report_file_object: ReportFil
     AssetTransaction.objects.get_or_create(
         asset_name=asset_name,
         side=side,
+        type=_get_type(row[tags_index]),
         price=price,
         quantity=quantity,
         executed_at=executed_at,
