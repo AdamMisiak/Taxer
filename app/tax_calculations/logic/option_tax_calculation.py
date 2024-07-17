@@ -54,16 +54,28 @@ def create_option_tax_calculations(closing_transaction: OptionTransaction):
             # calculate_tax_single_transaction_different_quantity_options(opening_transaction, closing_transaction, ratio)
 
             # tax_year = closing_transaction.executed_at.year or opening_transaction.executed_at.year
-            revenue = opening_transaction.full_value_pln*ratio
-            profit_or_loss = round(revenue - closing_transaction.full_value_pln, 2)
+            opening_is_sell = opening_transaction.type == TransactionType.OPENING and opening_transaction.side == TransactionSide.SELL
+            opening_is_buy = opening_transaction.type == TransactionType.OPENING and opening_transaction.side == TransactionSide.BUY
+            
+            if opening_is_sell:
+                revenue = opening_transaction.full_value_pln*ratio
+                cost = closing_transaction.full_value_pln
+                profit_or_loss = round(revenue - cost, 2)
+            elif opening_is_buy:
+                revenue = closing_transaction.full_value_pln*ratio
+                cost = opening_transaction.full_value_pln
+                profit_or_loss = round(revenue - cost, 2)
+
+
             tax_to_pay_from_transaction = round(profit_or_loss * settings.TAX_RATE, 2)
+
 
             OptionTaxCalculation.objects.get_or_create(
                 # tax_summary=TaxSummary.objects.get(year=tax_year),
                 opening_transaction=opening_transaction,
                 closing_transaction=closing_transaction,
                 revenue=revenue,
-                cost=closing_transaction.full_value_pln,
+                cost=cost,
                 profit_or_loss=profit_or_loss,
                 tax=tax_to_pay_from_transaction,
                 quantity=closing_transaction.quantity,
@@ -72,8 +84,15 @@ def create_option_tax_calculations(closing_transaction: OptionTransaction):
 
 
 
-    # TODO after switch to filtering with type field -> tax calcs data broker
-    # CHECK THAT
+
+    # NOTE "calculate_tax_multiple_transactions_same_quantity" was used for options - doing wrong calculations
+    # has to write new `calculate_tax_multiple_transactions` for options only 
+    # rememmber about the split (as above using opening_is_sell var) when opening is sell or buy 
+    # Example: tax calculations for AMT 15SEP23
+
+    # NOTE 2 check if those two if + elif are not failing
+
+
 
 
     # NOTE partial transactions for AMT are wrong - check that!!
