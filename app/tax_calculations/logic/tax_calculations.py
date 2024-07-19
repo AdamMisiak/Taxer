@@ -2,6 +2,7 @@ from django.conf import settings
 from transactions.models import BaseTransaction, OptionTransaction
 from tax_calculations.models import AssetTaxCalculation, OptionTaxCalculation
 from django.db.models import QuerySet
+from utils.choices import TransactionSide, TransactionType
 
 # Assets
 def calculate_tax_single_transaction_same_quantity(model: BaseTransaction, opening_transaction: BaseTransaction, closing_transaction: BaseTransaction):
@@ -23,10 +24,18 @@ def calculate_tax_single_transaction_same_quantity(model: BaseTransaction, openi
 def calculate_tax_multiple_transactions_same_quantity(
     model: BaseTransaction, opening_transaction: BaseTransaction, closing_transaction: BaseTransaction, quantity: int = None
 ):
-    revenue = 0
-    cost = opening_transaction.full_value_pln
+    # NOTE probna funkcja zeby zobaczyc jak dziala podzial na transaction sides
+    # NOTE zrobic to samo dla calculate_tax_single_transaction_same_quantity i sprawdzic AMT 15SEP23
+    if opening_transaction.side == TransactionSide.BUY:
+        revenue = 0
+        cost = opening_transaction.full_value_pln
+    else:
+        revenue = opening_transaction.full_value_pln
+        cost = 0
+
     profit_or_loss = round(revenue - cost, 2)
     tax_to_pay_from_transaction = round(profit_or_loss * settings.TAX_RATE, 2)
+
     model.objects.get_or_create(
         # tax_summary=TaxSummary.objects.get(year=tax_year),
         opening_transaction=opening_transaction,
@@ -85,6 +94,7 @@ def calculate_tax_multiple_transactions(model: BaseTransaction, matching_opening
     summary_opening_transactions_quantity = 0
 
     for opening_transaction in matching_opening_transactions:
+
         if (
             summary_opening_transactions_quantity == 0
             and opening_transaction.quantity == closing_transaction.quantity
