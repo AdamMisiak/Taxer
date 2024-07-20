@@ -6,21 +6,28 @@ from utils.choices import TransactionSide, TransactionType
 
 # Assets
 def calculate_tax_single_transaction_same_quantity(model: BaseTransaction, opening_transaction: BaseTransaction, closing_transaction: BaseTransaction):
-    tax_year = closing_transaction.executed_at.year or opening_transaction.executed_at.year
-    profit_or_loss = round(closing_transaction.full_value_pln - opening_transaction.full_value_pln, 2)
+    # NOTE add docstrings from gpt here 
+    if opening_transaction.side == TransactionSide.BUY:
+        revenue = closing_transaction.full_value_pln
+        cost = opening_transaction.full_value_pln
+    else:
+        revenue = opening_transaction.full_value_pln
+        cost = closing_transaction.full_value_pln
+
+    profit_or_loss = round(revenue - cost, 2)
     tax_to_pay_from_transaction = round(profit_or_loss * settings.TAX_RATE, 2)
 
     model.objects.get_or_create(
         # tax_summary=TaxSummary.objects.get(year=tax_year),
         opening_transaction=opening_transaction,
         closing_transaction=closing_transaction,
-        revenue=closing_transaction.full_value_pln,
-        cost=opening_transaction.full_value_pln,
+        revenue=revenue,
+        cost=cost,
         profit_or_loss=profit_or_loss,
         tax=tax_to_pay_from_transaction,
     )
 
-# NOTE think about the name? "same" quantity?
+# NOTE think about the name? "same" quantity? Take names from gpt
 def calculate_tax_multiple_transactions_same_quantity(
     model: BaseTransaction, opening_transaction: BaseTransaction, closing_transaction: BaseTransaction, quantity: int = None
 ):
