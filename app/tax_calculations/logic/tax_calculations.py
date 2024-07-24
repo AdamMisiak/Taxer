@@ -8,11 +8,11 @@ from utils.choices import TransactionSide, TransactionType
 def calculate_tax_single_transaction_same_quantity(model: BaseTransaction, opening_transaction: BaseTransaction, closing_transaction: BaseTransaction):
     # NOTE add docstrings from gpt here 
     if opening_transaction.side == TransactionSide.BUY:
-        revenue = closing_transaction.full_value_pln
-        cost = opening_transaction.full_value_pln
+        revenue = round(closing_transaction.full_value_pln, 2)
+        cost = round(opening_transaction.full_value_pln, 2)
     else:
-        revenue = opening_transaction.full_value_pln
-        cost = closing_transaction.full_value_pln
+        revenue = round(opening_transaction.full_value_pln, 2)
+        cost = round(closing_transaction.full_value_pln, 2)
 
     profit_or_loss = round(revenue - cost, 2)
     tax_to_pay_from_transaction = round(profit_or_loss * settings.TAX_RATE, 2)
@@ -31,13 +31,11 @@ def calculate_tax_single_transaction_same_quantity(model: BaseTransaction, openi
 def calculate_tax_multiple_transactions_same_quantity(
     model: BaseTransaction, opening_transaction: BaseTransaction, closing_transaction: BaseTransaction, quantity: int = None
 ):
-    # NOTE probna funkcja zeby zobaczyc jak dziala podzial na transaction sides
-    # NOTE zrobic to samo dla calculate_tax_single_transaction_same_quantity i sprawdzic AMT 15SEP23
     if opening_transaction.side == TransactionSide.BUY:
         revenue = 0
-        cost = opening_transaction.full_value_pln
+        cost = round(opening_transaction.full_value_pln, 2)
     else:
-        revenue = opening_transaction.full_value_pln
+        revenue = round(opening_transaction.full_value_pln, 2)
         cost = 0
 
     profit_or_loss = round(revenue - cost, 2)
@@ -59,8 +57,13 @@ def calculate_tax_multiple_transactions_different_quantity(
     ratio = quantity / opening_transaction.quantity
     # tax_year = closing_transaction.executed_at.year or opening_transaction.executed_at.year
 
-    revenue = round(closing_transaction.full_value_pln, 2)
-    cost = round(opening_transaction.full_value_pln * ratio, 2)
+    if opening_transaction.side == TransactionSide.BUY:
+        revenue = round(closing_transaction.full_value_pln, 2)
+        cost = round(opening_transaction.full_value_pln * ratio, 2)
+    else:
+        revenue = round(opening_transaction.full_value_pln * ratio, 2)
+        cost = round(closing_transaction.full_value_pln, 2)
+
     profit_or_loss = round(revenue - cost, 2)
     tax_to_pay_from_transaction = round(profit_or_loss * settings.TAX_RATE, 2)
 
@@ -149,21 +152,30 @@ def calculate_tax_multiple_transactions(model: BaseTransaction, matching_opening
         else:
             print(f"❌ Transaction: {opening_transaction} has not matching opening transactions!")
 
+
+# NOTE not needed? Can be replaced with general use one
 # Options
 # Is it needed when fucntions above are generic?
-def calculate_tax_single_transaction_same_quantity_options(opening_transaction: OptionTransaction, closing_transaction: OptionTransaction):
-    tax_year = closing_transaction.executed_at.year or opening_transaction.executed_at.year
-    profit_or_loss = round(opening_transaction.full_value_pln - closing_transaction.full_value_pln, 2)
-    tax_to_pay_from_transaction = round(profit_or_loss * settings.TAX_RATE, 2)
+# def calculate_tax_single_transaction_same_quantity_options(opening_transaction: OptionTransaction, closing_transaction: OptionTransaction):
+#     tax_year = closing_transaction.executed_at.year or opening_transaction.executed_at.year
+#     profit_or_loss = round(opening_transaction.full_value_pln - closing_transaction.full_value_pln, 2)
+#     tax_to_pay_from_transaction = round(profit_or_loss * settings.TAX_RATE, 2)
 
-    # NOTE is some needed check which transactions should be used for opening and closing?
-    # depending on the BUY and SELL of the option?
-    OptionTaxCalculation.objects.get_or_create(
-        # tax_summary=TaxSummary.objects.get(year=tax_year),
-        opening_transaction=opening_transaction,
-        closing_transaction=closing_transaction,
-        revenue=opening_transaction.full_value_pln,
-        cost=closing_transaction.full_value_pln,
-        profit_or_loss=profit_or_loss,
-        tax=tax_to_pay_from_transaction,
-    )
+#     if opening_transaction.side == TransactionSide.BUY:
+#         revenue = round(closing_transaction.full_value_pln, 2)
+#         cost = round(opening_transaction.full_value_pln, 2)
+#     else:
+#         revenue = round(opening_transaction.full_value_pln, 2)
+#         cost = round(closing_transaction.full_value_pln, 2)
+
+#     # NOTE is some needed check which transactions should be used for opening and closing?
+#     # depending on the BUY and SELL of the option?
+#     OptionTaxCalculation.objects.get_or_create(
+#         # tax_summary=TaxSummary.objects.get(year=tax_year),
+#         opening_transaction=opening_transaction,
+#         closing_transaction=closing_transaction,
+#         revenue=revenue,
+#         cost=cost,
+#         profit_or_loss=profit_or_loss,
+#         tax=tax_to_pay_from_transaction,
+#     )
