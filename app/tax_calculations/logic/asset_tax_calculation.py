@@ -5,7 +5,7 @@ from utils.choices import TransactionSide, TransactionType
 
 
 def create_asset_tax_calculations(sell_transaction: AssetTransaction):
-    from tax_calculations.logic import calculate_tax_single_transaction_same_quantity, calculate_tax_multiple_transactions
+    from tax_calculations.logic import calculate_tax_for_complete_transaction, calculate_tax_multiple_transactions
 
     print(f"ℹ️  Search for matching transactions for the closing transactions: {sell_transaction}")
     # NOTE "+ timedelta(days=3)" because some transactions are book on Monday next week -> there is first sell and but after that
@@ -27,7 +27,7 @@ def create_asset_tax_calculations(sell_transaction: AssetTransaction):
         if buy_transaction.quantity == sell_transaction.quantity and not buy_transaction.as_opening_calculation.all():
             print(f"ℹ️  Used {buy_transaction} transaction for the calculation")
             print("ℹ️  One matching transaction use case")
-            calculate_tax_single_transaction_same_quantity(
+            calculate_tax_for_complete_transaction(
                 model=AssetTaxCalculation, opening_transaction=buy_transaction, closing_transaction=sell_transaction
             )
         # NOTE add else here? Or another separated complex function 

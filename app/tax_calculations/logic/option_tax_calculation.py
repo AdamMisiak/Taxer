@@ -5,7 +5,7 @@ from utils.choices import TransactionSide, TransactionType
 
 
 def create_option_tax_calculations(closing_transaction: OptionTransaction):
-    from tax_calculations.logic import calculate_tax_single_transaction_same_quantity, calculate_tax_multiple_transactions
+    from tax_calculations.logic import calculate_tax_for_complete_transaction, calculate_tax_multiple_transactions
 
     print(f"ℹ️  Search for matching transactions for the transaction: {closing_transaction}")
     opposite_side = TransactionSide.SELL.value if closing_transaction.side == TransactionSide.BUY.value else TransactionSide.BUY.value
@@ -47,7 +47,7 @@ def create_option_tax_calculations(closing_transaction: OptionTransaction):
         opening_transaction = matching_opening_transactions.first()
         if opening_transaction.quantity == closing_transaction.quantity:
             print(f"ℹ️  Used {opening_transaction} transaction for the calculation")
-            calculate_tax_single_transaction_same_quantity(OptionTaxCalculation, opening_transaction, closing_transaction)
+            calculate_tax_for_complete_transaction(OptionTaxCalculation, opening_transaction, closing_transaction)
         else:
             ratio = closing_transaction.quantity / opening_transaction.quantity
             print(f"ℹ️  Used {opening_transaction} transaction with {ratio} ratio for the calculation")
