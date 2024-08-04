@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "files",
     "rates",
     "tax_calculations",
+    "tax_summaries",
     "transactions",
     "utils"
 ]
