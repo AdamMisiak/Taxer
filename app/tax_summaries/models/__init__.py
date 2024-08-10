@@ -1,1 +1,2 @@
 from .base_tax_summary import BaseTaxSummary
+from .asset_tax_summary import AsssetTaxSummary

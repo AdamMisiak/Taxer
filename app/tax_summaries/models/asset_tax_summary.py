@@ -1,6 +1,6 @@
 from django.db import models
 
-from app.tax_summaries.models import BaseTaxSummary
+from tax_summaries.models import BaseTaxSummary
 
 
 class AsssetTaxSummary(BaseTaxSummary):
