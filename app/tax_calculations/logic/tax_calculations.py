@@ -131,7 +131,7 @@ def calculate_tax_for_first_partial_transaction_with_different_quantity(model: B
 # -------------------------------
 
 
-
+# NOTE those are previous version of those functions from above 
 
 
 # def calculate_tax_single_transaction_same_quantity(model: BaseTransaction, opening_transaction: BaseTransaction, closing_transaction: BaseTransaction):
@@ -286,6 +286,13 @@ def calculate_tax_multiple_transactions(model: BaseTransaction, matching_opening
 
         else:
             print(f"❌ Transaction: {closing_transaction} has not matching opening transactions!")
+
+# NOTE leaving all the commented out code just in case 
+
+
+# NOTE next maybe start creating models for Tax Summary (sepearated for each class)
+
+
 
 
 # NOTE not needed? Can be replaced with general use one

@@ -27,6 +27,7 @@ class AssetTaxCalculationAdmin(admin.ModelAdmin):
             RELATIONS,
             {
                 "fields": (
+                    "tax_summary",
                     "opening_transaction",
                     "closing_transaction",
                 )

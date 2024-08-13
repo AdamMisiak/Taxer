@@ -2,9 +2,17 @@ from django.db import models
 
 from transactions.models import AssetTransaction
 from tax_calculations.models import BaseTaxCalculation
+from tax_summaries.models import AsssetTaxSummary
 
 
 class AssetTaxCalculation(BaseTaxCalculation):
+    tax_summary = models.ForeignKey(
+        AsssetTaxSummary,
+        related_name="tax_calculations",
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+    )
     opening_transaction = models.ForeignKey(
         AssetTransaction,
         related_name="as_opening_calculation",
