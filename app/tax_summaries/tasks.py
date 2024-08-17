@@ -6,7 +6,7 @@ from tax_calculations.models import AssetTaxCalculation
 from transactions.models import AssetTransaction, DividendTransaction, OptionTransaction
 from utils.exceptions import ImportException
 from utils.choices import TransactionSide
-from tax_calculations.logic import create_asset_tax_calculations, create_dividend_tax_calculations, create_option_tax_calculations
+from tax_summaries.logic import assign_asset_tax_summary
 from utils.choices import TransactionSide, TransactionType
 from tax_calculations.models import AssetTaxCalculation
 broker_name_mapping = {
@@ -19,10 +19,15 @@ def create_tax_summaries():
     print("⚡️ Celery task: create_tax_summaries function started.")
 
     print('➡️  Assets: \n')
-    tax_calculations_without_summary = AssetTaxCalculation.objects.filter(tax_summary__isnull=True).order_by("executed_at")
+    tax_calculations_without_summary = AssetTaxCalculation.objects.filter(tax_summary__isnull=True).order_by("closing_transaction__executed_at")
     for tax_calculation in tax_calculations_without_summary:
         print(tax_calculation)
-    #     create_asset_tax_calculations(sell_transaction)
+        assign_asset_tax_summary(tax_calculation)
+
+
+
+
+
 
 
     # print('➡️  Dividends: \n')

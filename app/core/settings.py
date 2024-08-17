@@ -150,6 +150,10 @@ CELERY_BEAT_SCHEDULE = {
         "task": "tax_calculations.tasks.create_tax_calculations",
         "schedule": crontab(minute="*/1"),
     },
+    "create_tax_summaries": {
+        "task": "tax_summaries.tasks.create_tax_summaries",
+        "schedule": crontab(minute="*/1"),
+    },
 }
 
 

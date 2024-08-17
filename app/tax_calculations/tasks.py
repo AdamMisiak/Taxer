@@ -1,13 +1,9 @@
 from celery import shared_task
-from files.models import ReportFile, CurrencyRateFile
 from django.conf import settings
 from files.logic import save_data_ib_lynx_report_file
-from tax_calculations.models import AssetTaxCalculation
 from transactions.models import AssetTransaction, DividendTransaction, OptionTransaction
-from utils.exceptions import ImportException
-from utils.choices import TransactionSide
 from tax_calculations.logic import create_asset_tax_calculations, create_dividend_tax_calculations, create_option_tax_calculations
-from utils.choices import TransactionSide, TransactionType
+from utils.choices import TransactionType
 
 broker_name_mapping = {
     settings.INTERACTIVE_BROKERS: save_data_ib_lynx_report_file,

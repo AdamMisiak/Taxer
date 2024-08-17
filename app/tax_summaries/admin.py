@@ -12,11 +12,12 @@ class AsssetTaxSummaryAdmin(admin.ModelAdmin):
         "year",
         "revenue",
         "cost",
+        "profit_or_loss",
         "tax",
     )
     list_filter = ("year",)
     search_fields = ("year",)
-    ordering = ("-year", "tax", "revenue", "cost", "tax")
+    ordering = ("-year", "revenue", "cost", "profit_or_loss", "tax")
 
     fieldsets = (
         (
@@ -26,6 +27,7 @@ class AsssetTaxSummaryAdmin(admin.ModelAdmin):
                     "year",
                     "cost",
                     "revenue",
+                    "profit_or_loss",
                     "tax",
                 )
             },
