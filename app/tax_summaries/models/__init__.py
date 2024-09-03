@@ -1,3 +1,4 @@
 from .base_tax_summary import BaseTaxSummary
 from .asset_tax_summary import AssetTaxSummary
 from .option_tax_summary import OptionTaxSummary
+from .dividend_tax_summary import DividendTaxSummary

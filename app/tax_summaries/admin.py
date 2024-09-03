@@ -1,5 +1,5 @@
 from django.contrib import admin
-from tax_summaries.models import AssetTaxSummary, OptionTaxSummary
+from tax_summaries.models import AssetTaxSummary, OptionTaxSummary, DividendTaxSummary
 
 BASE_INFO = "Base info"
 OTHER_INFO = "Other info"
@@ -62,6 +62,33 @@ class OptionTaxSummaryAdmin(admin.ModelAdmin):
         ),
     )
 
+class DividendTaxSummaryAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "year",
+        "revenue",
+        "tax_paid",
+        "tax",
+    )
+    list_filter = ("year",)
+    search_fields = ("year",)
+    ordering = ("-year", "revenue", "tax_paid", "tax")
+
+    fieldsets = (
+        (
+            BASE_INFO,
+            {
+                "fields": (
+                    "year",
+                    "tax_paid",
+                    "revenue",
+                    "tax",
+                )
+            },
+        ),
+    )
+
 admin.site.register(AssetTaxSummary, AssetTaxSummaryAdmin)
 admin.site.register(OptionTaxSummary, OptionTaxSummaryAdmin)
+admin.site.register(DividendTaxSummary, DividendTaxSummaryAdmin)
 

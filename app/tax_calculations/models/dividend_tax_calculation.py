@@ -2,9 +2,17 @@ from django.db import models
 
 from transactions.models import DividendTransaction, WithholdingTaxTransaction
 from tax_calculations.models import BaseTaxCalculation
+from tax_summaries.models import DividendTaxSummary
 
 
 class DividendTaxCalculation(BaseTaxCalculation):
+    tax_summary = models.ForeignKey(
+        DividendTaxSummary,
+        related_name="tax_calculations",
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+    )
     # NOTE one to one relation?
     withholding_tax_transaction = models.ForeignKey(
         WithholdingTaxTransaction,
