@@ -1,8 +1,8 @@
-from tax_summaries.models import AssetTaxSummary
+from tax_summaries.models import AsssetTaxSummary
 from tax_calculations.models import AssetTaxCalculation
 
-def _get_asset_tax_summary(tax_year: int) -> AssetTaxSummary:
-    asset_tax_summary, _ = AssetTaxSummary.objects.get_or_create(
+def _get_asset_tax_summary(tax_year: int) -> AsssetTaxSummary:
+    asset_tax_summary, _ = AsssetTaxSummary.objects.get_or_create(
         year=tax_year,
         defaults={'revenue': 0, 'cost': 0, "profit_or_loss": 0, 'tax': 0}
     )

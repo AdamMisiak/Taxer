@@ -290,10 +290,6 @@ def calculate_tax_multiple_transactions(model: BaseTransaction, matching_opening
 # NOTE leaving all the commented out code just in case 
 
 
-# NOTE next maybe start creating models for Tax Summary (sepearated for each class)
-
-
-
 
 # NOTE not needed? Can be replaced with general use one
 # Options

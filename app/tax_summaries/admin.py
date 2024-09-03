@@ -1,12 +1,12 @@
 from django.contrib import admin
-from tax_summaries.models import AsssetTaxSummary
+from tax_summaries.models import AssetTaxSummary
 
 BASE_INFO = "Base info"
 OTHER_INFO = "Other info"
 ASSET_INFO = "Asset info"
 RELATIONS = "Relations"
 
-class AsssetTaxSummaryAdmin(admin.ModelAdmin):
+class AssetTaxSummaryAdmin(admin.ModelAdmin):
     list_display = (
         "id",
         "year",
@@ -34,7 +34,5 @@ class AsssetTaxSummaryAdmin(admin.ModelAdmin):
         ),
     )
 
-    
-
-admin.site.register(AsssetTaxSummary, AsssetTaxSummaryAdmin)
+admin.site.register(AssetTaxSummary, AssetTaxSummaryAdmin)
 

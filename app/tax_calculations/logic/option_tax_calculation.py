@@ -4,6 +4,7 @@ from django.conf import settings
 from utils.choices import TransactionSide, TransactionType
 
 
+# TODO REFACTOR THIS FOR SURE!!
 def create_option_tax_calculations(closing_transaction: OptionTransaction):
     from tax_calculations.logic import calculate_tax_for_complete_transaction, calculate_tax_multiple_transactions
 
