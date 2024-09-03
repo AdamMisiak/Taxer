@@ -2,9 +2,17 @@ from django.db import models
 
 from transactions.models import OptionTransaction
 from tax_calculations.models import BaseTaxCalculation
+from tax_summaries.models import OptionTaxSummary
 
 
 class OptionTaxCalculation(BaseTaxCalculation):
+    tax_summary = models.ForeignKey(
+        OptionTaxSummary,
+        related_name="tax_calculations",
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+    )
     opening_transaction = models.ForeignKey(
         OptionTransaction,
         related_name="as_opening_calculation",
