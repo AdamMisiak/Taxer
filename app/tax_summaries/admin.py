@@ -1,10 +1,18 @@
 from django.contrib import admin
 from tax_summaries.models import AssetTaxSummary, OptionTaxSummary, DividendTaxSummary
+from tax_calculations.models import AssetTaxCalculation, OptionTaxCalculation, DividendTaxCalculation
 
 BASE_INFO = "Base info"
 OTHER_INFO = "Other info"
 ASSET_INFO = "Asset info"
 RELATIONS = "Relations"
+
+
+class AssetTaxCalculationInline(admin.StackedInline):
+    verbose_name_plural = "Related Asset Tax Calculation"
+    model = AssetTaxCalculation
+    fk_name = "tax_summary"
+    extra = 0
 
 class AssetTaxSummaryAdmin(admin.ModelAdmin):
     list_display = (
@@ -18,6 +26,9 @@ class AssetTaxSummaryAdmin(admin.ModelAdmin):
     list_filter = ("year",)
     search_fields = ("year",)
     ordering = ("-year", "revenue", "cost", "profit_or_loss", "tax")
+    inlines = [
+        AssetTaxCalculationInline,
+    ]
 
     fieldsets = (
         (
@@ -33,6 +44,12 @@ class AssetTaxSummaryAdmin(admin.ModelAdmin):
             },
         ),
     )
+
+class OptionTaxCalculationInline(admin.StackedInline):
+    verbose_name_plural = "Related Option Tax Calculation"
+    model = OptionTaxCalculation
+    fk_name = "tax_summary"
+    extra = 0
 
 class OptionTaxSummaryAdmin(admin.ModelAdmin):
     list_display = (
@@ -46,6 +63,9 @@ class OptionTaxSummaryAdmin(admin.ModelAdmin):
     list_filter = ("year",)
     search_fields = ("year",)
     ordering = ("-year", "revenue", "cost", "profit_or_loss", "tax")
+    # inlines = [
+    #     OptionTaxCalculationInline,
+    # ]
 
     fieldsets = (
         (
@@ -62,6 +82,12 @@ class OptionTaxSummaryAdmin(admin.ModelAdmin):
         ),
     )
 
+class DividendTaxCalculationInline(admin.StackedInline):
+    verbose_name_plural = "Related Dividend Tax Calculation"
+    model = DividendTaxCalculation
+    fk_name = "tax_summary"
+    extra = 0
+    
 class DividendTaxSummaryAdmin(admin.ModelAdmin):
     list_display = (
         "id",
@@ -73,6 +99,9 @@ class DividendTaxSummaryAdmin(admin.ModelAdmin):
     list_filter = ("year",)
     search_fields = ("year",)
     ordering = ("-year", "revenue", "tax_paid", "tax")
+    inlines = [
+        DividendTaxCalculationInline,
+    ]
 
     fieldsets = (
         (
