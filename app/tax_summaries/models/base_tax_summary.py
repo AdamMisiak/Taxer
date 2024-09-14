@@ -1,7 +1,6 @@
 from django.db import models
 
 
-
 class BaseTaxSummary(models.Model):
     year = models.IntegerField(unique=True)
 

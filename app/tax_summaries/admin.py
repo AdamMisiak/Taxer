@@ -1,5 +1,5 @@
 from django.contrib import admin
-from tax_summaries.models import AssetTaxSummary, OptionTaxSummary, DividendTaxSummary
+from tax_summaries.models import GeneralTaxSummary, AssetTaxSummary, OptionTaxSummary, DividendTaxSummary
 from tax_calculations.models import AssetTaxCalculation, OptionTaxCalculation, DividendTaxCalculation
 
 BASE_INFO = "Base info"
@@ -32,6 +32,14 @@ class AssetTaxSummaryAdmin(admin.ModelAdmin):
 
     fieldsets = (
         (
+            RELATIONS,
+            {
+                "fields": (
+                    "general_tax_summary",
+                )
+            },
+        ),
+        (
             BASE_INFO,
             {
                 "fields": (
@@ -44,6 +52,35 @@ class AssetTaxSummaryAdmin(admin.ModelAdmin):
             },
         ),
     )
+
+class GeneralTaxSummaryAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "year",
+        "revenue",
+        "cost",
+        "profit_or_loss",
+        "tax",
+    )
+    list_filter = ("year",)
+    search_fields = ("year",)
+    ordering = ("-year", "revenue", "cost", "profit_or_loss", "tax")
+
+    fieldsets = (
+        (
+            BASE_INFO,
+            {
+                "fields": (
+                    "year",
+                    "cost",
+                    "revenue",
+                    "profit_or_loss",
+                    "tax",
+                )
+            },
+        ),
+    )
+
 
 class OptionTaxCalculationInline(admin.StackedInline):
     verbose_name_plural = "Related Option Tax Calculation"
@@ -68,6 +105,14 @@ class OptionTaxSummaryAdmin(admin.ModelAdmin):
     # ]
 
     fieldsets = (
+        (
+            RELATIONS,
+            {
+                "fields": (
+                    "general_tax_summary",
+                )
+            },
+        ),
         (
             BASE_INFO,
             {
@@ -105,6 +150,14 @@ class DividendTaxSummaryAdmin(admin.ModelAdmin):
 
     fieldsets = (
         (
+            RELATIONS,
+            {
+                "fields": (
+                    "general_tax_summary",
+                )
+            },
+        ),
+        (
             BASE_INFO,
             {
                 "fields": (
@@ -118,6 +171,7 @@ class DividendTaxSummaryAdmin(admin.ModelAdmin):
     )
 
 admin.site.register(AssetTaxSummary, AssetTaxSummaryAdmin)
+admin.site.register(GeneralTaxSummary, GeneralTaxSummaryAdmin)
 admin.site.register(OptionTaxSummary, OptionTaxSummaryAdmin)
 admin.site.register(DividendTaxSummary, DividendTaxSummaryAdmin)
 

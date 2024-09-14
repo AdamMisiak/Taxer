@@ -4,6 +4,13 @@ from tax_summaries.models import BaseTaxSummary
 
 
 class DividendTaxSummary(BaseTaxSummary):
+    general_tax_summary = models.OneToOneField(
+        "GeneralTaxSummary",
+        related_name="dividend_tax_summaries",
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+    )
     revenue = models.FloatField(blank=True, null=True)
     tax_paid = models.FloatField(blank=True, null=True)
     # NOTE remaining tax to paid in Poland

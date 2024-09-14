@@ -4,6 +4,13 @@ from tax_summaries.models import BaseTaxSummary
 
 
 class AssetTaxSummary(BaseTaxSummary):
+    general_tax_summary = models.OneToOneField(
+        "GeneralTaxSummary",
+        related_name="asset_tax_summaries",
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+    )
     revenue = models.FloatField(blank=True, null=True)
     cost = models.FloatField(blank=True, null=True)
     profit_or_loss = models.FloatField(blank=True, null=True)

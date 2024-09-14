@@ -3,14 +3,7 @@ from django.db import models
 from tax_summaries.models import BaseTaxSummary
 
 
-class OptionTaxSummary(BaseTaxSummary):
-    general_tax_summary = models.OneToOneField(
-        "GeneralTaxSummary",
-        related_name="option_tax_summaries",
-        on_delete=models.CASCADE,
-        blank=True,
-        null=True,
-    )
+class GeneralTaxSummary(BaseTaxSummary):
     revenue = models.FloatField(blank=True, null=True)
     cost = models.FloatField(blank=True, null=True)
     profit_or_loss = models.FloatField(blank=True, null=True)
@@ -18,11 +11,11 @@ class OptionTaxSummary(BaseTaxSummary):
 
 
     class Meta:
-        verbose_name = "Option tax summary ➕"
-        verbose_name_plural = "Option tax summaries ➕"
+        verbose_name = "General tax summary ➕"
+        verbose_name_plural = "General tax summaries ➕"
 
     def __str__(self):
-        return f"{OptionTaxSummary.__name__} - {self.year} - Tax: {self.tax} PLN"
+        return f"{GeneralTaxSummary.__name__} - {self.year} - Tax: {self.tax} PLN"
     
     def save(self, *args, **kwargs):
 
@@ -31,4 +24,4 @@ class OptionTaxSummary(BaseTaxSummary):
         else:
             print(f"✅ Created: {self}\n")
 
-        super(OptionTaxSummary, self).save(*args, **kwargs)
+        super(GeneralTaxSummary, self).save(*args, **kwargs)
