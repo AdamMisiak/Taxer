@@ -26,7 +26,7 @@ def assign_general_tax_summary_to_dividend_tax_summary(tax_summary: DividendTaxS
 
     general_tax_summary.revenue += tax_summary.revenue
     general_tax_summary.cost += tax_summary.tax_paid
-    # general_tax_summary.profit_or_loss += tax_summary.profit_or_loss
+    general_tax_summary.profit_or_loss += tax_summary.profit_or_loss
     general_tax_summary.tax += tax_summary.tax
     general_tax_summary.save()
 

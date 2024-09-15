@@ -13,6 +13,7 @@ class DividendTaxSummary(BaseTaxSummary):
     )
     revenue = models.FloatField(blank=True, null=True)
     tax_paid = models.FloatField(blank=True, null=True)
+    profit_or_loss = models.FloatField(blank=True, null=True)
     # NOTE remaining tax to paid in Poland
     tax = models.FloatField(blank=True, null=True)
 

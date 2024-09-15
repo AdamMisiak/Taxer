@@ -4,7 +4,7 @@ from tax_calculations.models import DividendTaxCalculation
 def _get_dividend_tax_summary(tax_year: int) -> DividendTaxSummary:
     dividend_tax_summary, _ = DividendTaxSummary.objects.get_or_create(
         year=tax_year,
-        defaults={'revenue': 0, 'tax_paid': 0, 'tax': 0}
+        defaults={'revenue': 0, 'tax_paid': 0, "profit_or_loss": 0, 'tax': 0}
     )
     return dividend_tax_summary
 
@@ -14,6 +14,7 @@ def assign_dividend_tax_summary(tax_calculation: DividendTaxCalculation):
 
     dividend_tax_summary.revenue += tax_calculation.revenue
     dividend_tax_summary.tax_paid += tax_calculation.cost
+    dividend_tax_summary.profit_or_loss += tax_calculation.profit_or_loss
     dividend_tax_summary.tax += tax_calculation.tax
     dividend_tax_summary.save()
 

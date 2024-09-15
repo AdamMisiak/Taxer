@@ -75,6 +75,7 @@ class DividendTaxCalculationAdmin(admin.ModelAdmin):
             RELATIONS,
             {
                 "fields": (
+                    "tax_summary",
                     "withholding_tax_transaction",
                     "dividend_transaction",
                 )
@@ -115,6 +116,7 @@ class OptionTaxCalculationAdmin(admin.ModelAdmin):
             RELATIONS,
             {
                 "fields": (
+                    "tax_summary",
                     "opening_transaction",
                     "closing_transaction",
                 )
