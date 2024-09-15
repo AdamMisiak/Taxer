@@ -1,4 +1,4 @@
 from .asset_tax_summary import assign_asset_tax_summary
 from .option_tax_summary import assign_option_tax_summary
 from .dividend_tax_summary import assign_dividend_tax_summary
-from .general_tax_summary import assign_general_tax_summary
+from .general_tax_summary import assign_general_tax_summary, assign_general_tax_summary_to_dividend_tax_summary
