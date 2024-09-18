@@ -1,8 +1,8 @@
 from celery import shared_task
 from django.conf import settings
 from files.logic import save_data_ib_lynx_report_file
-from transactions.models import AssetTransaction, DividendTransaction, OptionTransaction
-from tax_calculations.logic import create_asset_tax_calculations, create_dividend_tax_calculations, create_option_tax_calculations
+from transactions.models import AssetTransaction, DividendTransaction, OptionTransaction, InterestRateTransaction
+from tax_calculations.logic import create_asset_tax_calculations, create_dividend_tax_calculations, create_option_tax_calculations, create_interest_rate_tax_calculations
 from utils.choices import TransactionType
 
 broker_name_mapping = {
@@ -29,3 +29,8 @@ def create_tax_calculations():
     option_transactions_without_calculations = OptionTransaction.objects.filter(type=TransactionType.CLOSING.value, as_closing_calculation__isnull=True, as_opening_calculation__isnull=True).order_by("executed_at")
     for option_transaction in option_transactions_without_calculations:
         create_option_tax_calculations(option_transaction)
+
+    print('➡️  Interest Rates: \n')
+    interest_rate_transactions_without_calculations = InterestRateTransaction.objects.filter(tax_calculation__isnull=True).order_by("executed_at")
+    for interest_rate_transaction in interest_rate_transactions_without_calculations:
+        create_interest_rate_tax_calculations(interest_rate_transaction)

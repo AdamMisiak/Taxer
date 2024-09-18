@@ -234,6 +234,7 @@ def calculate_tax_for_first_partial_transaction_with_different_quantity(model: B
 
 # NOTE
 # add fees/margin calculations
+# check if calculations are ok
 
 
 

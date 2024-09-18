@@ -2,3 +2,4 @@ from .asset_tax_calculation import create_asset_tax_calculations
 from .dividend_tax_calculation import create_dividend_tax_calculations
 from .tax_calculations import calculate_tax_for_complete_transaction, calculate_tax_multiple_transactions
 from .option_tax_calculation import create_option_tax_calculations
+from .interest_rate_tax_calculation import create_interest_rate_tax_calculations
