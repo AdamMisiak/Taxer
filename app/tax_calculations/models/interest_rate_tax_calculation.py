@@ -2,17 +2,17 @@ from django.db import models
 
 from transactions.models import InterestRateTransaction
 from tax_calculations.models import BaseTaxCalculation
-from tax_summaries.models import AssetTaxSummary
+from tax_summaries.models import InterestRateTaxSummary
 
 
 class InterestRateTaxCalculation(BaseTaxCalculation):
-    # tax_summary = models.ForeignKey(
-    #     AssetTaxSummary,
-    #     related_name="tax_calculations",
-    #     on_delete=models.CASCADE,
-    #     blank=True,
-    #     null=True,
-    # )
+    tax_summary = models.ForeignKey(
+        InterestRateTaxSummary,
+        related_name="tax_calculations",
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+    )
     # NOTE one to one relation?
     interest_rate_transaction = models.ForeignKey(
         InterestRateTransaction,
